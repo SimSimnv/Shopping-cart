@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Shopping Cart{% endblock %}</title>
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('cart.gif.ico') }}" />
+    </head>
+    <body>
+        <header>
+            <nav class="site-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="{{ path('homepage') }}">Home</a></li>
+                    <li class="nav-item"><a href="{{ path('offers_list') }}">Offers</a></li>
+
+                    {% if app.user %}
+                        <li class="nav-item"><a href="{{ path('products_list') }}">My products</a></li>
+                        <li class="nav-item"><a href="">Welcome {{ app.user.username }}</a></li>
+                        <li class="nav-item"><a href="{{ path('user_logout') }}">Logout</a></li>
+                        <li class="nav-item"><a href=""><em>&dollar;{{ app.user.money }}</em></a></li>
+                    {% else %}
+                        <li class="nav-item"><a href="{{ path('user_login') }}">Login</a></li>
+                        <li class="nav-item"><a href="{{ path('user_register') }}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {% for msg in app.session.flashBag.get('success') %}
+                <div class="msg-success">{{ msg }}</div>
+            {% endfor %}
+
+            {% for msg in app.session.flashBag.get('error') %}
+                <div class="msg-error">{{ msg }}</div>
+            {% endfor %}
+
+
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer>
+            <p class="footer-text">&copy; Shopping Cart - 2017</p>
+        </footer>
+    </body>
+</html>

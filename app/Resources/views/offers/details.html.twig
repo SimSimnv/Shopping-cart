@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+    <ul>
+        <li>{{ offer.title }}</li>
+        <li>Product name: {{ product.name }}</li>
+        <li>Product quantity: {{ product.quantity }}</li>
+        <li>Price: {{ offer.price }}</li>
+        <li>{{ offer.description }}</li>
+        <li>Publisher: {{ offer.user.username }}</li>
+    </ul>
+    {% if offer.user.username == app.user.username|default(null) %}
+        <div>
+            <a href="{{ path('offers_cancel',{'id':offer.id}) }}">Cancel offer</a>
+        </div>
+    {% else %}
+        <form action="{{ path('offers_buy',{'id':offer.id}) }}" method="post">
+            <div>
+                <label>
+                    <span>Choose amount:</span>
+                    <select name="amount">
+                        {% for i in 1..product.quantity %}
+                            <option value="{{ loop.index }}">{{ loop.index }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+            <input type="submit" value="Buy!">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        </form>
+    {% endif %}
+
+{% endblock %}
