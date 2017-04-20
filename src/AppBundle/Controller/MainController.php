@@ -12,6 +12,6 @@ class MainController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('default/index.html.twig');
+        return $this->render('main/default/index.html.twig');
     }
 }

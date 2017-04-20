@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function indexAction()
     {
         $products=$this->getDoctrine()->getRepository(Product::class)->findBy(['user'=>$this->getUser()]);
-        return $this->render('products/list.html.twig',['products'=>$products]);
+        return $this->render('main/products/list.html.twig',['products'=>$products]);
     }
     /**
      * @Route("/products/create", name="products_create")
@@ -40,7 +40,7 @@ class ProductController extends Controller
             return $this->redirectToRoute('products_list');
         }
 
-        return $this->render("products/create.html.twig",['create_form'=>$form->createView()]);
+        return $this->render("main/products/create.html.twig",['create_form'=>$form->createView()]);
     }
 
     /**

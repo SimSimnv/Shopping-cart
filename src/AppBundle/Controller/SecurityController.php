@@ -37,7 +37,7 @@ class SecurityController extends Controller
             $this->addFlash('success','User '.$user->getUsername()." was registered successfully!");
             return $this->redirectToRoute("user_login");
         }
-        return $this->render("security/register.html.twig",['register_form'=>$form->createView()]);
+        return $this->render("main/security/register.html.twig",['register_form'=>$form->createView()]);
     }
 
     /**
@@ -47,7 +47,7 @@ class SecurityController extends Controller
     {
         $auth_utils=$this->get('security.authentication_utils');
 
-        return $this->render("security/login.html.twig",[
+        return $this->render("main/security/login.html.twig",[
             'last_username'=>$auth_utils->getLastUsername(),
             'error'=>$auth_utils->getLastAuthenticationError()
         ]);

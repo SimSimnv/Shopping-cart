@@ -1,0 +1,23 @@
+{% extends "main/base.html.twig" %}
+
+{% block content %}
+    <ul>
+        <li>{{ offer.title }}</li>
+        <li>Product name: {{ product.name }}</li>
+        <li>Product quantity: {{ product.quantity }}</li>
+        <li>Price: {{ offer.price }}</li>
+        <li>{{ offer.description }}</li>
+        <li>Publisher: {{ offer.user.username }}</li>
+    </ul>
+    {% if offer.user.username == app.user.username|default(null) %}
+        <div>
+            <a href="{{ path('offers_cancel',{'id':offer.id}) }}">Cancel offer</a>
+        </div>
+    {% else %}
+        {{ form_start(cart_form) }}
+        {{ form_widget(cart_form) }}
+        <input type="submit" value="Add to cart!">
+        {{ form_end(cart_form) }}
+    {% endif %}
+
+{% endblock %}

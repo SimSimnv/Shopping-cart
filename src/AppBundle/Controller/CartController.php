@@ -53,7 +53,7 @@ class CartController extends Controller
             return $this->redirectToRoute('products_list');
         }
 
-        return $this->render('cart/main.html.twig', [
+        return $this->render('main/cart/main.html.twig', [
             'purchases'=>$purchases,
             'cart_form'=>$form->createView()
         ]);

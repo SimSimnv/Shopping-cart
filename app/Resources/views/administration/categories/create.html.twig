@@ -1,0 +1,8 @@
+{% extends "administration/base.html.twig" %}
+
+{% block content %}
+    {{ form_start(form_create) }}
+    {{ form_widget(form_create) }}
+    <input type="submit" value="Add category!">
+    {{ form_end(form_create) }}
+{% endblock %}

@@ -23,7 +23,7 @@ class OfferController extends Controller
     public function indexAction()
     {
         $offers=$this->getDoctrine()->getRepository(Offer::class)->findAll();
-        return $this->render('offers/list.html.twig', ['offers'=>$offers]);
+        return $this->render('main/offers/list.html.twig', ['offers'=>$offers]);
     }
 
     /**
@@ -55,7 +55,7 @@ class OfferController extends Controller
                 $quantity=$offer->getQuantity();
                 if($quantity>$product->getQuantity()){
                     $this->addFlash('error','You don\'t have enough '.$product->getName());
-                    return $this->render('offers/create.html.twig',['create_form'=>$form->createView()]);
+                    return $this->render('main/offers/create.html.twig',['create_form'=>$form->createView()]);
                 }
 
 
@@ -84,7 +84,7 @@ class OfferController extends Controller
                 return $this->redirectToRoute('offers_list');
             }
 
-            return $this->render('offers/create.html.twig',['create_form'=>$form->createView()]);
+            return $this->render('main/offers/create.html.twig',['create_form'=>$form->createView()]);
     }
 
     /**
@@ -102,7 +102,7 @@ class OfferController extends Controller
             return $this->redirectToRoute('offers_list');
         }
 
-        return $this->render('offers/details.html.twig',[
+        return $this->render('main/offers/details.html.twig',[
             'offer'=>$offer,
             'product'=>$offer->getProduct(),
             'cart_form'=>$form->createView()
@@ -139,7 +139,7 @@ class OfferController extends Controller
         $userProduct->setQuantity($offerProduct->getQuantity());
         $userProduct->setUser($user);
 
-        $user->addProduct($offerProduct);
+        $user->addProduct($userProduct);
         $em=$this->getDoctrine()->getManager();
         $em->remove($offer);
         $em->remove($offerProduct);

@@ -1,0 +1,12 @@
+{% extends "administration/base.html.twig" %}
+
+{% block content %}
+<ul>
+    {% for category in categories %}
+        <li>{{ category.name }} | <a href="{{ path('categories_remove',{'id':category.id}) }}">Remove</a></li>
+    {% endfor %}
+</ul>
+    <div>
+        <a href="{{ path('categories_create') }}">Add category</a>
+    </div>
+{% endblock %}
