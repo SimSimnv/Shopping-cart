@@ -90,64 +90,34 @@ class OfferController extends Controller
     /**
      * @Route("/offers/{id}", name="offers_details", requirements={"id": "\d+"})
      */
-    public function detailsAction(Offer $offer)
+    public function detailsAction(Offer $offer, Request $request)
     {
+
+        $form = $this->createFormBuilder([])->getForm();
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $this->addToCart($offer);
+            $this->addFlash('success','Added to cart!');
+            return $this->redirectToRoute('offers_list');
+        }
 
         return $this->render('offers/details.html.twig',[
             'offer'=>$offer,
-            'product'=>$offer->getProduct()
+            'product'=>$offer->getProduct(),
+            'cart_form'=>$form->createView()
         ]);
     }
 
-    /**
-     * @Route("offers/{id}/buy", name="offers_buy")
-     * @Method("POST")
-     *  @Security("has_role('ROLE_USER')")
-     */
-    public function buyAction(Request $request, Offer $offer)
+    private function addToCart(Offer $offer)
     {
-        $amount=$request->request->get('amount');
-        $product=$offer->getProduct();
-        if($amount>$product->getQuantity()){
-            $this->addFlash('error','Invalid amount!');
-            return $this->redirectToRoute('offers_details',['id'=>$offer->getId()]);
-        }
-
-        $price=$offer->getPrice()*$amount;
-
         /**@var $user User**/
         $user=$this->getUser();
-
-        if ($user->getMoney()<$price){
-            $this->addFlash('error','You don\'t have enough money!');
-            return $this->redirectToRoute('offers_details',['id'=>$offer->getId()]);
-        }
-
-        $product->reduceQuantity($amount);
-        $offer->getUser()->increaseMoney($price);
-
-        $purchasedProduct=new Product();
-        $purchasedProduct->setName($product->getName());
-        $purchasedProduct->setUser($user);
-        $purchasedProduct->setQuantity($amount);
-
-        $user->addProduct($product);
-        $user->reduceMoney($price);
-
+        $user->addPurchase($offer);
         $em=$this->getDoctrine()->getManager();
-
-        if($product->getQuantity()==0){
-            $em->remove($product);
-            $em->remove($offer);
-        }
-
-        $em->persist($purchasedProduct);
         $em->flush();
-
-        $this->addFlash('success','Purchase successful!');
-        return $this->redirectToRoute('products_list');
-
     }
+
     /**
      * @Route("offers/{id}/cancel", name="offers_cancel")
      * @Security("has_role('ROLE_USER')")
@@ -178,4 +148,5 @@ class OfferController extends Controller
         $this->addFlash('success','Offer canceled');
         return $this->redirectToRoute('products_list');
     }
+
 }

@@ -81,12 +81,20 @@ class User implements UserInterface
      */
     private $offers;
 
+    /**
+     * @var Offer[]|ArrayCollection
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Offer", inversedBy="buyers")
+     * @ORM\JoinTable(name="user_purchases", joinColumns={@ORM\JoinColumn(name="user_id",referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="offer_id", referencedColumnName="id")})
+     */
+    private $purchases;
+
 
     public  function __construct()
     {
         $this->roles=new ArrayCollection();
         $this->products=new ArrayCollection();
         $this->offers=new ArrayCollection();
+        $this->purchases=new ArrayCollection();
     }
 
 
@@ -285,6 +293,27 @@ class User implements UserInterface
     public function increaseMoney($amount)
     {
         $this->money+=$amount;
+    }
+
+    /**
+     * @return Offer[]|ArrayCollection
+     */
+    public function getPurchases()
+    {
+        return $this->purchases;
+    }
+
+    /**
+     * @param Offer[]|ArrayCollection $purchases
+     */
+    public function setPurchases($purchases)
+    {
+        $this->purchases = $purchases;
+    }
+
+    public function addPurchase(Offer $purchase)
+    {
+        $this->getPurchases()->add($purchase);
     }
 
 }

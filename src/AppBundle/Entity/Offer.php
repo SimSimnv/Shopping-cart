@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -67,6 +68,19 @@ class Offer
      * @Assert\NotNull(message="Please select a category")
      */
     private $category;
+
+
+    /**
+     * @var User[]|ArrayCollection
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\User", mappedBy="purchases")
+     */
+    private $buyers;
+
+    public function __construct()
+    {
+        $this->buyers=new ArrayCollection();
+    }
+
 
     /**
      * Get id
@@ -213,6 +227,23 @@ class Offer
     {
         $this->category = $category;
     }
+
+    /**
+     * @return User[]|ArrayCollection
+     */
+    public function getBuyers()
+    {
+        return $this->buyers;
+    }
+
+    /**
+     * @param User[]|ArrayCollection $buyers
+     */
+    public function setBuyers($buyers)
+    {
+        $this->buyers = $buyers;
+    }
+
 
 
 
