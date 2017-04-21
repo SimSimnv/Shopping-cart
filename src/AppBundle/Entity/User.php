@@ -89,6 +89,7 @@ class User implements UserInterface
     private $purchases;
 
 
+
     public  function __construct()
     {
         $this->roles=new ArrayCollection();
@@ -226,7 +227,25 @@ class User implements UserInterface
     public function addRole(Role $role){
         $this->roles->add($role);
     }
+    public function removeRole(Role $role)
+    {
+        $this->roles->removeElement($role);
+    }
+    public function getHighestRole()
+    {
+        $roles=$this->getRoles();
+        if(count($roles)==1){
+            return 'User';
+        }
+        else if(count($roles)==2){
+            return 'Editor';
+        }
+        else if(count($roles)==3){
+            return 'Administrator';
+        }
+        return 'Invalid role';
 
+    }
     /**
      * Returns the salt that was originally used to encode the password.
      *

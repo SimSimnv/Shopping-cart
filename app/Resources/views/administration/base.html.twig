@@ -15,6 +15,9 @@
                     <li class="nav-item"><a href="{{ path('homepage') }}">Main site</a></li>
                     <li class="nav-item"><a href="{{ path('categories_list') }}">Manage Categories</a></li>
                     <li class="nav-item"><a href="{{ path('admin_offers_list') }}">Manage Offers</a></li>
+                    {% if  is_granted('ROLE_ADMIN')  %}
+                        <li class="nav-item"><a href="{{ path('admin_users_list') }}">Manage Users</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </header>
