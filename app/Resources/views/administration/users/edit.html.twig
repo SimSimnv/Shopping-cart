@@ -1,15 +1,21 @@
 {% extends 'administration/base.html.twig' %}
 
 {% block content %}
-{{ form_start(edit_form) }}
-{{ form_errors(edit_form) }}
-    <div>
-        Email: {{ user.email }}
+    <div class="box">
+    <div class="col-lg-6 col-lg-offset-3">
+        {% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
+        {{ form_start(edit_form) }}
+        {{ form_errors(edit_form) }}
+        <div>
+            Email: {{ user.email }}
+        </div>
+        {{ form_row(edit_form.username) }}
+        {{ form_row(edit_form.money) }}
+        <div>
+            Role: {{ user.highestRole }}
+        </div>
+        {{ form_end(edit_form) }}
     </div>
-    {{ form_row(edit_form.username) }}
-    {{ form_row(edit_form.money) }}
-    <div>
-        Role: {{ user.highestRole }}
     </div>
-{{ form_end(edit_form) }}
+
 {% endblock %}

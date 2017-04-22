@@ -16,7 +16,7 @@ class OfferType extends AbstractType
     {
         $builder
             ->add('title',TextType::class)
-            ->add('price',MoneyType::class)
+            ->add('price',MoneyType::class,['currency'=>'USD'])
             ->add('description',TextareaType::class)
             ->add('category',null,['placeholder'=>'--Select a category--']);
     }

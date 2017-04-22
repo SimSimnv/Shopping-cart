@@ -1,18 +1,23 @@
 {% extends 'administration/base.html.twig' %}
 
 {% block content %}
-    <ul>
-        {% for user in users %}
-            <li>
-                {{ user.username }}
-                -
-                {{ user.highestRole }}
-                -
-                <a href="{{ path('admin_users_edit',{'id':user.id}) }}">Edit</a>
-                |
-                <a href="{{ path('admin_users_products',{'id':user.id}) }}">Manage Products</a>
+    <div class="box">
+    <div class="col-lg-12">
+        <ul>
+            {% for user in users %}
+                <li>
+                    {{ user.username }}
+                    -
+                    {{ user.highestRole }}
+                    -
+                    <a href="{{ path('admin_users_edit',{'id':user.id}) }}">Edit</a>
+                    |
+                    <a href="{{ path('admin_users_products',{'id':user.id}) }}">Manage Products</a>
 
-            </li>
-        {% endfor %}
-    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
+
 {% endblock %}

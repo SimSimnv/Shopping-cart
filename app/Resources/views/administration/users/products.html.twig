@@ -1,28 +1,37 @@
 {% extends 'administration/base.html.twig' %}
 
 {% block content %}
-    <h2>{{ user.username }}'s products:</h2>
-    <table border="1" cellpadding="0" cellspacing="0">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Quantity</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for product in products %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.quantity }}</td>
-                <td>
-                    <a href="{{ path('admin_users_products_delete',{'id':user.id,'product_id':product.id}) }}">Remove</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <div>
-        <a href="{{ path('admin_users_products_create',{'id':user.id}) }}">Add a product!</a>
+    <div class="box">
+        <div class="col-lg-12">
+
+            <div class="col-lg-12">
+                <hr>
+                <h2 class="intro-text text-center">
+                    <strong>{{ user.username }}'s products:</strong>
+                </h2>
+                <hr>
+            </div>
+            <div class="my-products-btn">
+                <a href="{{ path('admin_users_products_create',{'id':user.id}) }}" class="btn btn-info">Add a product!</a>
+            </div>
+            {% for product in products %}
+                <div class="my-product">
+                    <div class="col-md-6">
+                        <img class="img-responsive img-border-left" src="{{ asset('img/slide-2.jpg') }}" alt="product-img">
+                    </div>
+                    <div class="col-md-6">
+                        <p>Name: {{ product.name }}</p>
+                        <p>Quantity: {{ product.quantity }}</p>
+                        <p>
+                            <a href="{{ path('admin_users_products_delete',{'id':user.id,'product_id':product.id}) }}" class="btn btn-primary">Remove</a>
+                        </p>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            {% endfor %}
+
+
+        </div>
     </div>
+    
 {% endblock %}

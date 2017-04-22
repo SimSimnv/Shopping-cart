@@ -51,7 +51,7 @@ class AdministratorController extends Controller
 
         $form->handleRequest($request);
 
-        if($form->isValid() && $form->isSubmitted()){
+        if($form->isSubmitted() && $form->isValid()){
             $em=$this->getDoctrine()->getManager();
 
             if($form->has('promote') && $form->get('promote')->isClicked()){

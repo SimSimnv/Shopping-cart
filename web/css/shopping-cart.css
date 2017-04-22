@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" );
+@import url("https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic");
+
+body{
+    /background: url('../img/background.jpeg') no-repeat center center fixed;
+    background: linear-gradient(to right, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+}
+.navbar-nav li a{
+    letter-spacing: normal;
+    padding:35px 15px 35px 15px;
+}
+form{
+    text-align: center;
+}
+form input{
+    text-align: center;
+}
+.offer-item a img{
+    transition: all 0.5s;
+}
+.offer-item a:hover img{
+    transform: scale(1.1);
+}
+
+
+.my-products-btn{
+    text-align: center;
+    margin: 20px;
+}
+.my-product{
+    margin: 20px;
+}
+
+
+
+
+
+.admin-page{
+    background: linear-gradient(to right, #649173, #dbd5a4);
+}
