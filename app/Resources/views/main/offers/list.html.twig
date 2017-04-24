@@ -3,23 +3,49 @@
 {% block content %}
 
     <div class="row">
-        <div class="box">
+
+        <div class="box col-lg-3">
+            <div class="col-lg-12">
+                <hr>
+                <h2 class="intro-text text-center"><strong>Categories</strong></h2>
+                <hr>
+            </div>
+            <ul class="list-group col-lg-12">
+                <li class="list-group-item {% if selected == 'all' %} selected-category {% endif %}">
+                    <a href="{{ path('offers_list') }}" class="category-item ">All</a>
+                </li>
+              {% for category in categories %}
+                      <li class="list-group-item {% if selected == category.name %} selected-category {% endif %}">
+                          <a href="{{ path('offers_by_category',{'name':category.name}) }}" class="category-item">{{ category.name }}</a>
+                      </li>
+              {% endfor %}
+            </ul>
+        </div>
+
+        <div class="box col-lg-8 col-lg-offset-1">
             <div class="col-lg-12">
                 <hr>
                 <h2 class="intro-text text-center"><strong>Offers</strong></h2>
+                <h2 class="intro-text text-center">{{ selected }}</h2>
                 <hr>
             </div>
-            {% for offer in offers %}
-                <div class="col-sm-4 text-center">
-                    <div class="offer-item">
-                        <a href="{{ path('offers_details',{'id':offer.id}) }}">
-                            <img class="img-responsive" src="{{ asset('img/5190001_sa.jpg') }}" alt="product-img">
-                        </a>
-                        <h3>{{ offer.title }}</h3>
-                        <p>{{ offer.price }} &dollar;</p>
-                    </div>
+            {% if offers is empty %}
+                <div class="col-lg-12">
+                    <h3 class="text-center"><strong>No offers found</strong></h3>
                 </div>
-            {% endfor %}
+            {% else %}
+                {% for offer in offers %}
+                    <div class="col-sm-4 text-center">
+                        <div class="offer-item">
+                            <a href="{{ path('offers_details',{'id':offer.id}) }}">
+                                <img class="img-responsive" src="{{ asset('img/5190001_sa.jpg') }}" alt="product-img">
+                            </a>
+                            <h3>{{ offer.title }}</h3>
+                            <p>{{ offer.price }} &dollar;</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="clearfix"></div>
         </div>
     </div>

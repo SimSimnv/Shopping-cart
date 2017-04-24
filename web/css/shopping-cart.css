@@ -30,10 +30,23 @@ form input{
 .my-product{
     margin: 20px;
 }
-
-
-
-
+.list-group-item{
+    padding: 0;
+}
+.list-group-item .category-item{
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: black;
+    padding: 10px 15px;
+}
+.list-group-item:hover{
+    background-color: rgb(147,206,222);
+}
+.selected-category{
+    background-color: rgb(147,206,222);
+}
 
 .admin-page{
     background: linear-gradient(to right, #649173, #dbd5a4);

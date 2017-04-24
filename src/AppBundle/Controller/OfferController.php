@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Category;
 use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
 use AppBundle\Entity\User;
@@ -22,8 +23,33 @@ class OfferController extends Controller
      */
     public function indexAction()
     {
+        $categories=$this->getDoctrine()->getRepository(Category::class)->findAll();
         $offers=$this->getDoctrine()->getRepository(Offer::class)->findAll();
-        return $this->render('main/offers/list.html.twig', ['offers'=>$offers]);
+        return $this->render(
+            'main/offers/list.html.twig',
+            [
+                'offers'=>$offers,
+                'categories'=>$categories,
+                'selected'=>'all'
+            ]);
+    }
+
+    /**
+     * @Route("/offers/categories/{name}", name="offers_by_category")
+     *
+     */
+    public function categoriesAction($name)
+    {
+        $categories=$this->getDoctrine()->getRepository(Category::class)->findAll();
+        $category=$this->getDoctrine()->getRepository(Category::class)->findBy(['name'=>$name]);
+        $offers=$this->getDoctrine()->getRepository(Offer::class)->findBy(['category'=>$category]);
+        return $this->render(
+            'main/offers/list.html.twig',
+            [
+                'offers'=>$offers,
+                'categories'=>$categories,
+                'selected'=>$name
+            ]);
     }
 
     /**
@@ -109,7 +135,7 @@ class OfferController extends Controller
         ]);
     }
 
-    private function addToCart(Offer $offer)
+    protected function addToCart(Offer $offer)
     {
         /**@var $user User**/
         $user=$this->getUser();
