@@ -40,7 +40,7 @@
 
                     <li><a href="{{ path('products_list') }}">My products</a></li>
                     <li><a href="{{ path('cart') }}">My cart</a></li>
-                    <li><a href="">Welcome {{ app.user.username }}</a></li>
+                    <li><a href="{{ path('user_profile',{'name':app.user.username}) }}">Welcome {{ app.user.username }}</a></li>
                     <li><a href="{{ path('user_logout') }}">Logout</a></li>
                     <li><a href=""><em>&dollar;{{ app.user.money }}</em></a></li>
                     {% if is_granted('ROLE_EDITOR') %}

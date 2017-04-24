@@ -1,0 +1,53 @@
+{% extends "main/base.html.twig" %}
+
+{% block content %}
+    <div class="box">
+    <div class="col-lg-12">
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center">
+                <strong>{{ user.username }}</strong>
+            </h2>
+            <hr>
+            <p class="text-center">Email: {{ user.email }}</p>
+            {% if user == app.user %}
+                <p class="text-center">Money: {{ user.money }} &dollar;</p>
+                <div class="text-center">
+                    <a href="{{ path('products_list') }}" class="btn btn-primary">My products</a>
+                </div>
+            {% endif %}
+            <div class="col-lg-6 col-lg-offset-3">
+                <hr>
+                <h2 class="intro-text text-center"><strong>Offers</strong></h2>
+
+                {% if user.offers is empty %}
+                    <h4 class="intro-text text-center">No Offers</h4>
+                {% else %}
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Link</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for offer in user.offers %}
+                        <tr>
+                            <td>{{ offer.title }}</td>
+                            <td>{{ offer.category.name }}</td>
+                            <td>{{ offer.price }}</td>
+                            <td><a href="{{ path('offers_details',{'id':offer.id}) }}" class="btn btn-default">See offer</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+{% endblock %}

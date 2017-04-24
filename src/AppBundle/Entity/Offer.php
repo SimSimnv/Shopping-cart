@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -29,6 +30,7 @@ class Offer
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
+     * @Assert\NotBlank(message="Please enter title")
      */
     private $title;
 
@@ -36,6 +38,8 @@ class Offer
      * @var string
      *
      * @ORM\Column(name="price", type="decimal", precision=11, scale=2)
+     * @Assert\NotBlank(message="Please enter price")
+     * @Assert\GreaterThan(value="0",message="Price must be a positive number")
      */
     private $price;
 
@@ -43,6 +47,7 @@ class Offer
      * @var string
      *
      * @ORM\Column(name="description", type="text")
+     * @Assert\NotBlank(message="Please write description")
      */
     private $description;
 
