@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Product
@@ -41,6 +42,13 @@ class Product
      */
     private $user;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="image", type="string", length=255, nullable=true)
+     * @Assert\Image(mimeTypes={"image/png", "image/jpeg"},maxSize="5M")
+     */
+    private $image;
 
 
     /**
@@ -130,6 +138,24 @@ class Product
             $arr[$i]=$i;
         }
         return $arr;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     * @return Product
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+        return $this;
     }
 
 }

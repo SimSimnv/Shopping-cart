@@ -73,6 +73,7 @@ class OfferController extends Controller
                 $returnedProduct=new Product();
                 $returnedProduct->setName($product->getName());
                 $returnedProduct->setQuantity($returnedQuantity);
+                $returnedProduct->setImage($product->getImage());
                 $returnedProduct->setUser($productOwner);
                 $productOwner->addProduct($returnedProduct);
                 $em->persist($returnedProduct);
@@ -111,6 +112,7 @@ class OfferController extends Controller
         $userProduct=new Product();
         $userProduct->setName($offerProduct->getName());
         $userProduct->setQuantity($offerProduct->getQuantity());
+        $userProduct->setImage($offerProduct->getImage());
         $userProduct->setUser($user);
 
         $user->addProduct($userProduct);

@@ -21,7 +21,7 @@ class ProductController extends Controller
     /**
      * @Route("/{id}/products", name="admin_users_products")
      */
-    public function productsListAction(Request $request, User $user)
+    public function indexAction(Request $request, User $user)
     {
         $products=$this->getDoctrine()->getRepository(Product::class)->findBy(['user'=>$user]);
         return $this->render('administration/products/list.html.twig',[
@@ -33,13 +33,17 @@ class ProductController extends Controller
     /**
      * @Route("/{id}/products/create", name="admin_users_products_create")
      */
-    public function productsCreateAction(Request $request, User $user)
+    public function createAction(Request $request, User $user)
     {
         $product=new Product();
         $form=$this->createForm(ProductType::class,$product);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+            $imageUploader=$this->get('image_uploader');
+            $imgLocation=$imageUploader->upload($product);
+            $product->setImage($imgLocation);
+
             $product->setUser($user);
             $em=$this->getDoctrine()->getManager();
             $em->persist($product);
@@ -54,7 +58,7 @@ class ProductController extends Controller
     /**
      * @Route("/{id}/products/{product_id}/delete", name="admin_users_products_delete")
      */
-    public function productsRemoveAction($id,$product_id)
+    public function removeAction($id,$product_id)
     {
         $product=$this->getDoctrine()->getRepository(Product::class)->find($product_id);
         $em=$this->getDoctrine()->getManager();

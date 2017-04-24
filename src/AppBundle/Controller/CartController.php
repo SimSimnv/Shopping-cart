@@ -98,6 +98,7 @@ class CartController extends Controller
         $purchasedProduct->setName($product->getName());
         $purchasedProduct->setUser($user);
         $purchasedProduct->setQuantity($amount);
+        $purchasedProduct->setImage($product->getImage());
 
         $user->addProduct($product);
         $user->reduceMoney($price);

@@ -38,9 +38,9 @@
                     <div class="col-sm-4 text-center">
                         <div class="offer-item">
                             <a href="{{ path('offers_details',{'id':offer.id}) }}">
-                                <img class="img-responsive" src="{{ asset('img/5190001_sa.jpg') }}" alt="product-img">
+                                <img class="img-responsive" src="{{ asset('uploads/products/'~offer.product.image) }}" alt="product-img">
                             </a>
-                            <h3>{{ offer.title }}</h3>
+                            <h4>{{ offer.title }}</h4>
                             <p>{{ offer.price }} &dollar;</p>
                         </div>
                     </div>

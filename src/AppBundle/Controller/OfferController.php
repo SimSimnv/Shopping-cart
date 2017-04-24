@@ -89,6 +89,7 @@ class OfferController extends Controller
                 $offerProduct=new Product();
                 $offerProduct->setName($product->getName());
                 $offerProduct->setQuantity($quantity);
+                $offerProduct->setImage($product->getImage());
 
                 $offer->setProduct($offerProduct);
                 $offer->setUser($this->getUser());
@@ -163,6 +164,7 @@ class OfferController extends Controller
         $userProduct=new Product();
         $userProduct->setName($offerProduct->getName());
         $userProduct->setQuantity($offerProduct->getQuantity());
+        $userProduct->setImage($offerProduct->getImage());
         $userProduct->setUser($user);
 
         $user->addProduct($userProduct);
