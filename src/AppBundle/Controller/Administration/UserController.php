@@ -1,28 +1,27 @@
 <?php
 
-namespace AppBundle\Controller;
+namespace AppBundle\Controller\Administration;
 
-use AppBundle\Entity\Product;
+
+
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
-use AppBundle\Form\ProductType;
 use AppBundle\Form\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Security("has_role('ROLE_ADMIN')")
- * @Route("/administration")
+ * @Route("/administration/users")
  */
-class AdministratorController extends Controller
+class UserController extends Controller
 {
     /**
-     * @Route("/users", name="admin_users_list")
+     * @Route("/", name="admin_users_list")
      */
     public function usersIndexAction()
     {
@@ -31,7 +30,7 @@ class AdministratorController extends Controller
     }
 
     /**
-     * @Route("/users/{id}/edit", name="admin_users_edit")
+     * @Route("/{id}/edit", name="admin_users_edit")
      */
     public function usersEditAction(Request $request, User $user)
     {
@@ -103,51 +102,5 @@ class AdministratorController extends Controller
             $editorRole=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_EDITOR']);
             $user->removeRole($editorRole);
         }
-    }
-
-    /**
-     * @Route("/users/{id}/products", name="admin_users_products")
-     */
-    public function productsListAction(Request $request, User $user)
-    {
-        $products=$this->getDoctrine()->getRepository(Product::class)->findBy(['user'=>$user]);
-        return $this->render('administration/users/products.html.twig',[
-            'user'=>$user,
-            'products'=>$products
-        ]);
-    }
-
-    /**
-     * @Route("/users/{id}/products/create", name="admin_users_products_create")
-     */
-    public function productsCreateAction(Request $request, User $user)
-    {
-        $product=new Product();
-        $form=$this->createForm(ProductType::class,$product);
-        $form->handleRequest($request);
-
-        if($form->isSubmitted() && $form->isValid()){
-            $product->setUser($user);
-            $em=$this->getDoctrine()->getManager();
-            $em->persist($product);
-            $em->flush();
-            $this->addFlash('success','Product created!');
-            return $this->redirectToRoute('admin_users_products',['id'=>$user->getId()]);
-        }
-
-        return $this->render("administration/users/create_product.html.twig",['create_form'=>$form->createView()]);
-    }
-
-    /**
-     * @Route("/users/{id}/products/{product_id}/delete", name="admin_users_products_delete")
-     */
-    public function productsRemoveAction($id,$product_id)
-    {
-        $product=$this->getDoctrine()->getRepository(Product::class)->find($product_id);
-        $em=$this->getDoctrine()->getManager();
-        $em->remove($product);
-        $em->flush();
-        $this->addFlash('success','Product removed!');
-        return $this->redirectToRoute('admin_users_products',['id'=>$id]);
     }
 }
