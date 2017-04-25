@@ -80,6 +80,9 @@ class OfferController extends Controller
 
                 $product->reduceQuantity($returnedQuantity);
                 if($product->getQuantity()==0){
+                    foreach ($offer->getReviews() as $review){
+                        $em->remove($review);
+                    }
                     $em->remove($product);
                     $em->remove($offer);
                 }
@@ -117,6 +120,9 @@ class OfferController extends Controller
 
         $user->addProduct($userProduct);
         $em=$this->getDoctrine()->getManager();
+        foreach ($offer->getReviews() as $review){
+            $em->remove($review);
+        }
         $em->remove($offer);
         $em->remove($offerProduct);
         $em->persist($userProduct);

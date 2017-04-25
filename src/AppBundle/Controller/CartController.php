@@ -7,6 +7,7 @@ use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
 use AppBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -75,7 +76,7 @@ class CartController extends Controller
         return $this->redirectToRoute('cart');
     }
 
-    private function buyProduct(Offer $offer, $amount,$em)
+    private function buyProduct(Offer $offer, $amount,EntityManager $em)
     {
         $product=$offer->getProduct();
         if($amount>$product->getQuantity()){
@@ -105,6 +106,9 @@ class CartController extends Controller
 
 
         if($product->getQuantity()==0){
+            foreach ($offer->getReviews() as $review){
+                $em->remove($review);
+            }
             $em->remove($product);
             $em->remove($offer);
         }

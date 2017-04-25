@@ -81,9 +81,18 @@ class Offer
      */
     private $buyers;
 
+    /**
+     * @var Review[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Review",mappedBy="offer")
+     */
+    private $reviews;
+
+
+
     public function __construct()
     {
         $this->buyers=new ArrayCollection();
+        $this->reviews=new ArrayCollection();
     }
 
 
@@ -247,6 +256,22 @@ class Offer
     public function setBuyers($buyers)
     {
         $this->buyers = $buyers;
+    }
+
+    /**
+     * @return Review[]|ArrayCollection
+     */
+    public function getReviews()
+    {
+        return $this->reviews;
+    }
+
+    /**
+     * @param Review[]|ArrayCollection $reviews
+     */
+    public function setReviews($reviews)
+    {
+        $this->reviews = $reviews;
     }
 
 

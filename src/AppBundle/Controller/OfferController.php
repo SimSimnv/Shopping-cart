@@ -5,8 +5,10 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
+use AppBundle\Entity\Review;
 use AppBundle\Entity\User;
 use AppBundle\Form\OfferType;
+use AppBundle\Form\ReviewType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -23,14 +25,14 @@ class OfferController extends Controller
      */
     public function indexAction()
     {
-        $categories=$this->getDoctrine()->getRepository(Category::class)->findAll();
-        $offers=$this->getDoctrine()->getRepository(Offer::class)->findAll();
+        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
+        $offers = $this->getDoctrine()->getRepository(Offer::class)->findAll();
         return $this->render(
             'main/offers/list.html.twig',
             [
-                'offers'=>$offers,
-                'categories'=>$categories,
-                'selected'=>'all'
+                'offers' => $offers,
+                'categories' => $categories,
+                'selected' => 'all'
             ]);
     }
 
@@ -40,108 +42,66 @@ class OfferController extends Controller
      */
     public function categoriesAction($name)
     {
-        $categories=$this->getDoctrine()->getRepository(Category::class)->findAll();
-        $category=$this->getDoctrine()->getRepository(Category::class)->findBy(['name'=>$name]);
-        $offers=$this->getDoctrine()->getRepository(Offer::class)->findBy(['category'=>$category]);
+        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
+        $category = $this->getDoctrine()->getRepository(Category::class)->findBy(['name' => $name]);
+        $offers = $this->getDoctrine()->getRepository(Offer::class)->findBy(['category' => $category]);
         return $this->render(
             'main/offers/list.html.twig',
             [
-                'offers'=>$offers,
-                'categories'=>$categories,
-                'selected'=>$name
+                'offers' => $offers,
+                'categories' => $categories,
+                'selected' => $name
             ]);
     }
 
-    /**
-     * @Route("/offers/create/{product_id}", name="offers_create")
-     * @Security("has_role('ROLE_USER')")
-     */
-    public function createAction(Request $request, $product_id)
-    {
-            $product=$this->getDoctrine()->getRepository(Product::class)->find($product_id);
-            $offer=new Offer();
-            $form=$this->createForm(OfferType::class,$offer);
-
-            $quantity=[];
-            for ($i=1; $i<=$product->getQuantity(); $i++){
-                $quantity[$i]=$i;
-            }
-
-            $form->add(
-                'quantity',
-                ChoiceType::class,
-                [
-                    'choices'=>$quantity,
-                ]
-            );
-
-            $form->handleRequest($request);
-
-            if($form->isSubmitted() && $form->isValid()){
-                $quantity=$offer->getQuantity();
-                if($quantity>$product->getQuantity()){
-                    $this->addFlash('error','You don\'t have enough '.$product->getName());
-                    return $this->render('main/offers/create.html.twig',['create_form'=>$form->createView()]);
-                }
-
-
-
-                $offerProduct=new Product();
-                $offerProduct->setName($product->getName());
-                $offerProduct->setQuantity($quantity);
-                $offerProduct->setImage($product->getImage());
-
-                $offer->setProduct($offerProduct);
-                $offer->setUser($this->getUser());
-
-                $em=$this->getDoctrine()->getManager();
-
-                $product->reduceQuantity($quantity);
-                if($product->getQuantity()==0){
-                    $em->remove($product);
-                }
-
-                $em->persist($offerProduct);
-                $em->persist($offer);
-                $em->flush();
-
-
-
-                $this->addFlash('success','Offer created!');
-                return $this->redirectToRoute('offers_list');
-            }
-
-            return $this->render('main/offers/create.html.twig',['create_form'=>$form->createView()]);
-    }
 
     /**
      * @Route("/offers/{id}", name="offers_details", requirements={"id": "\d+"})
      */
     public function detailsAction(Offer $offer, Request $request)
     {
+        $cartForm = $this->createFormBuilder([])->getForm();
 
-        $form = $this->createFormBuilder([])->getForm();
-        $form->handleRequest($request);
+        $review = new Review();
+        $reviewForm = $this->createForm(ReviewType::class, $review);
 
-        if($form->isSubmitted() && $form->isValid()){
-            $this->addToCart($offer);
-            $this->addFlash('success','Added to cart!');
-            return $this->redirectToRoute('offers_list');
+        if ($request->getMethod() === 'POST') {
+            if ($request->request->has('form')) {
+                $cartForm->handleRequest($request);
+                if ($cartForm->isSubmitted() && $cartForm->isValid()) {
+                    $this->addToCart($offer);
+                    $this->addFlash('success', 'Added to cart!');
+                    return $this->redirectToRoute('offers_list');
+                }
+            }
+            if ($request->request->has('app_bundle_review_type')) {
+                $reviewForm->handleRequest($request);
+                if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
+                    $review->setUser($this->getUser());
+                    $review->setOffer($offer);
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($review);
+                    $em->flush();
+                    $this->addFlash('success', 'Added review!');
+                    return $this->redirectToRoute('offers_details', ['id' => $offer->getId()]);
+                }
+            }
         }
 
-        return $this->render('main/offers/details.html.twig',[
-            'offer'=>$offer,
-            'product'=>$offer->getProduct(),
-            'cart_form'=>$form->createView()
+        return $this->render('main/offers/details.html.twig', [
+            'offer' => $offer,
+            'product' => $offer->getProduct(),
+            'cart_form' => $cartForm->createView(),
+            'review_form' => $reviewForm->createView()
         ]);
     }
 
     protected function addToCart(Offer $offer)
     {
-        /**@var $user User**/
-        $user=$this->getUser();
+        /**@var $user User* */
+        $user = $this->getUser();
         $user->addPurchase($offer);
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $em->flush();
     }
 
@@ -151,29 +111,32 @@ class OfferController extends Controller
      */
     public function cancelAction(Offer $offer)
     {
-        /**@var $user User**/
-        $user=$this->getUser();
+        /**@var $user User* */
+        $user = $this->getUser();
 
-        if($offer->getUser()->getId() != $user->getId()){
-            $this->addFlash('error','Not your offer!');
-            return $this->redirectToRoute('offers_details',['id'=>$offer->getId()]);
+        if ($offer->getUser()->getId() != $user->getId()) {
+            $this->addFlash('error', 'Not your offer!');
+            return $this->redirectToRoute('offers_details', ['id' => $offer->getId()]);
         }
 
-        $offerProduct=$offer->getProduct();
+        $offerProduct = $offer->getProduct();
 
-        $userProduct=new Product();
+        $userProduct = new Product();
         $userProduct->setName($offerProduct->getName());
         $userProduct->setQuantity($offerProduct->getQuantity());
         $userProduct->setImage($offerProduct->getImage());
         $userProduct->setUser($user);
 
         $user->addProduct($userProduct);
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
+        foreach ($offer->getReviews() as $review) {
+            $em->remove($review);
+        }
         $em->remove($offer);
         $em->remove($offerProduct);
         $em->persist($userProduct);
         $em->flush();
-        $this->addFlash('success','Offer canceled');
+        $this->addFlash('success', 'Offer canceled');
         return $this->redirectToRoute('products_list');
     }
 

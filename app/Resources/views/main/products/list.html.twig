@@ -23,7 +23,7 @@
                 <p>Name: {{ product.name }}</p>
                 <p>Quantity: {{ product.quantity }}</p>
                 <p>
-                    <a href="{{ path('offers_create',{'product_id':product.id}) }}" class="btn btn-primary">Sell</a>
+                    <a href="{{ path('products_sell',{'id':product.id}) }}" class="btn btn-primary">Sell</a>
                     <a href="{{ path('products_delete',{'id':product.id}) }}" class="btn btn-primary">Remove</a>
                 </p>
             </div>

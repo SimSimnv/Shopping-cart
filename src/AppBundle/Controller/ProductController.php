@@ -2,11 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
+use AppBundle\Form\OfferType;
 use AppBundle\Form\ProductType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 
 class ProductController extends Controller
@@ -63,5 +66,63 @@ class ProductController extends Controller
         $this->addFlash('success','Product removed!');
         return $this->redirectToRoute('products_list');
     }
+
+    /**
+     * @Route("/products/{id}/sell", name="products_sell")
+     * @Security("has_role('ROLE_USER')")
+     */
+    public function sellAction(Request $request, Product $product)
+    {
+        $offer=new Offer();
+        $form=$this->createForm(OfferType::class,$offer);
+
+        $quantity=[];
+        for ($i=1; $i<=$product->getQuantity(); $i++){
+            $quantity[$i]=$i;
+        }
+
+        $form->add(
+            'quantity',
+            ChoiceType::class,
+            [
+                'choices'=>$quantity,
+            ]
+        );
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $quantity=$offer->getQuantity();
+            if($quantity>$product->getQuantity()){
+                $this->addFlash('error','You don\'t have enough '.$product->getName());
+                return $this->render('main/products/sell.html.twig',['create_form'=>$form->createView()]);
+            }
+
+            $offerProduct=new Product();
+            $offerProduct->setName($product->getName());
+            $offerProduct->setQuantity($quantity);
+            $offerProduct->setImage($product->getImage());
+
+            $offer->setProduct($offerProduct);
+            $offer->setUser($this->getUser());
+
+            $em=$this->getDoctrine()->getManager();
+
+            $product->reduceQuantity($quantity);
+            if($product->getQuantity()==0){
+                $em->remove($product);
+            }
+
+            $em->persist($offerProduct);
+            $em->persist($offer);
+            $em->flush();
+
+            $this->addFlash('success','Offer created!');
+            return $this->redirectToRoute('offers_list');
+        }
+
+        return $this->render('main/products/sell.html.twig',['create_form'=>$form->createView()]);
+    }
+
 
 }

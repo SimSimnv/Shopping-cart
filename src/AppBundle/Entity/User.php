@@ -88,6 +88,12 @@ class User implements UserInterface
      */
     private $purchases;
 
+    /**
+     * @var Review[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Review",mappedBy="user")
+     */
+    private $reviews;
+
 
 
     public  function __construct()
@@ -96,6 +102,7 @@ class User implements UserInterface
         $this->products=new ArrayCollection();
         $this->offers=new ArrayCollection();
         $this->purchases=new ArrayCollection();
+        $this->reviews=new ArrayCollection();
     }
 
 
@@ -334,6 +341,24 @@ class User implements UserInterface
     {
         $this->getPurchases()->add($purchase);
     }
+
+    /**
+     * @return Review[]|ArrayCollection
+     */
+    public function getReviews()
+    {
+        return $this->reviews;
+    }
+
+    /**
+     * @param Review[]|ArrayCollection $reviews
+     */
+    public function setReviews($reviews)
+    {
+        $this->reviews = $reviews;
+    }
+
+
 
 }
 
