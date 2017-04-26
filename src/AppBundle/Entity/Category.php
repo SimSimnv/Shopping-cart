@@ -35,9 +35,17 @@ class Category
      */
     private $offers;
 
+    /**
+     * @var Promotion[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Promotion",mappedBy="category")
+     */
+    private $promotions;
+
+
     public function __construct()
     {
         $this->offers=new ArrayCollection();
+        $this->promotions=new ArrayCollection();
     }
 
 
@@ -95,5 +103,24 @@ class Category
     {
         return $this->getName();
     }
+
+    /**
+     * @return Promotion[]|ArrayCollection
+     */
+    public function getPromotions()
+    {
+        return $this->promotions;
+    }
+
+    /**
+     * @param Promotion[]|ArrayCollection $promotions
+     */
+    public function setPromotions($promotions)
+    {
+        $this->promotions = $promotions;
+    }
+
+
+
 }
 

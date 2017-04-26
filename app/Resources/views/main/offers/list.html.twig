@@ -41,7 +41,17 @@
                                 <img class="img-responsive" src="{{ asset('uploads/products/'~offer.product.image) }}" alt="product-img">
                             </a>
                             <h4>{{ offer.title }}</h4>
-                            <p>{{ offer.price }} &dollar;</p>
+                            <p>
+                                {% set offerPromo = calc.calculatePrice(offer) %}
+
+                                {% if offerPromo != offer.price %}
+                                    <del>{{ offer.price }}</del>
+                                {% endif %}
+                                {{ offerPromo | number_format(2) }}
+
+
+                                {#{{ offer.price }} &dollar;#}
+                            </p>
                         </div>
                     </div>
                 {% endfor %}

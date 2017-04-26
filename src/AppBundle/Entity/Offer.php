@@ -87,12 +87,17 @@ class Offer
      */
     private $reviews;
 
-
+    /**
+     * @var Promotion[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Promotion", mappedBy="offer")
+     */
+    private $promotions;
 
     public function __construct()
     {
         $this->buyers=new ArrayCollection();
         $this->reviews=new ArrayCollection();
+        $this->promotions=new ArrayCollection();
     }
 
 
@@ -272,6 +277,22 @@ class Offer
     public function setReviews($reviews)
     {
         $this->reviews = $reviews;
+    }
+
+    /**
+     * @return Promotion[]|ArrayCollection
+     */
+    public function getPromotions()
+    {
+        return $this->promotions;
+    }
+
+    /**
+     * @param Promotion[]|ArrayCollection $promotions
+     */
+    public function setPromotions($promotions)
+    {
+        $this->promotions = $promotions;
     }
 
 

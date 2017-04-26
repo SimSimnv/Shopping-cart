@@ -121,7 +121,10 @@ class ProductController extends Controller
             return $this->redirectToRoute('offers_list');
         }
 
-        return $this->render('main/products/sell.html.twig',['create_form'=>$form->createView()]);
+        return $this->render('main/products/sell.html.twig',[
+            'create_form'=>$form->createView(),
+            'product'=>$product
+        ]);
     }
 
 

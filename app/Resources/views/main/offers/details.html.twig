@@ -4,48 +4,93 @@
     <div class="box">
     <div class="col-lg-12">
 
-    <ul>
-        <li>{{ offer.title }}</li>
-        <li>Product name: {{ product.name }}</li>
-        <li>Product quantity: {{ product.quantity }}</li>
-        <li>Price: {{ offer.price }}</li>
-        <li>{{ offer.description }}</li>
-        <li>Publisher: {{ offer.user.username }}</li>
-    </ul>
-    {% if offer.user.username == app.user.username|default(null) %}
-        <div>
-            <a href="{{ path('offers_cancel',{'id':offer.id}) }}">Cancel offer</a>
+    <div class="my-product">
+        <div class="col-md-6">
+            <img class="img-responsive img-border-left" src="{{ asset('uploads/products/'~product.image) }}" alt="product-img">
         </div>
-    {% else %}
-        {{ form_start(cart_form) }}
-        {{ form_widget(cart_form) }}
-        <input type="submit" value="Add to cart!" class="btn btn-primary">
-        {{ form_end(cart_form) }}
+        <div class="col-md-6 text-center">
+            <hr>
+            <h2 class="intro-text">
+                <strong>{{ offer.title }}</strong>
+            </h2>
+            <hr>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Product</th>
+                    <td>{{ product.name }}</td>
+                </tr>
+                <tr>
+                    <th>Quantity</th>
+                    <td>{{ product.quantity }}</td>
+                </tr>
+                <tr>
+                    <th>Price</th>
+                    <td>
+                        {% set offerPromo = calc.calculatePrice(offer) %}
+
+                        {% if offerPromo != offer.price %}
+                            <del>{{ offer.price }}</del>
+                        {% endif %}
+                        {{ offerPromo | number_format(2) }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ offer.description }}</td>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <td><a href="{{ path('user_profile',{'name':offer.user.username}) }}">{{ offer.user.username }}</a></td>
+                </tr>
+            </table>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    {% if app.user %}
+        {% if offer.user.username == app.user.username %}
+            <div class="text-center">
+                <a href="{{ path('offers_cancel',{'id':offer.id}) }}" class="btn btn-danger">Cancel offer</a>
+                <a href="{{ path('offer_promotion',{'id':offer.id}) }}" class="btn btn-success">Add promotion</a>
+            </div>
+        {% else %}
+            {{ form_start(cart_form) }}
+            {{ form_widget(cart_form) }}
+            <input type="submit" value="Add to cart!" class="btn btn-primary">
+            {{ form_end(cart_form) }}
+        {% endif %}
     {% endif %}
 
     <div class="col-lg-12">
         <h3 class="text-center"><strong>Reviews</strong></h3>
     </div>
 
-    <div class="col-lg-6 col-lg-offset-3">
-        {% form_theme review_form 'bootstrap_3_layout.html.twig' %}
-        {{ form_start(review_form) }}
-            {{ form_widget(review_form) }}
-            <input type="submit" value="Leave review" class="btn btn-default" formnovalidate>
-        {{ form_end(review_form) }}
-    </div>
+    {% if app.user  %}
+        <div class="col-lg-6 col-lg-offset-3">
+            {% form_theme review_form 'bootstrap_3_layout.html.twig' %}
+            {{ form_start(review_form) }}
+                {{ form_widget(review_form) }}
+                <input type="submit" value="Leave review" class="btn btn-default" formnovalidate>
+            {{ form_end(review_form) }}
+        </div>
+    {% endif %}
 
     {% if offer.reviews is empty %}
         <div class="col-lg-12">
             <h3 class="text-center">No reviews found</h3>
         </div>
     {% else %}
+        <div class="review-section col-lg-8 col-lg-offset-2 ">
         {% for review in offer.reviews %}
-            <div class="col-lg-12 col-lg-offset-3">
-                Author: {{ review.user.username }}
-                {{ review.body }}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong><a href="{{ path('user_profile',{'name':review.user.username}) }}">{{ review.user.username }}</a></strong> <span class="text-muted">commented on {{ review.createdOn|date('d-m-Y') }}</span>
+                </div>
+                <div class="panel-body">
+                    {{ review.body }}
+                </div>
             </div>
         {% endfor %}
+        </div>
     {% endif %}
 
     </div>

@@ -21,7 +21,13 @@
                 <td>{{ offer.price }}</td>
                 <td>{{ offer.user.username }}</td>
                 <td>{{ offer.category.name }}</td>
-                <td><a href="{{ path('admin_offers_edit',{'id':offer.id}) }}">Edit</a> | <a href="{{ path('admin_offers_remove',{'id':offer.id}) }}">Remove</a></td>
+                <td>
+                    <a href="{{ path('admin_offers_edit',{'id':offer.id}) }}">Edit</a> 
+                    | 
+                    <a href="{{ path('admin_offers_remove',{'id':offer.id}) }}">Remove</a>
+                    |
+                    <a href="{{ path('admin_offer_promotion',{'id':offer.id}) }}">Add promotion</a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

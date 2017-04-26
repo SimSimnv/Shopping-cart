@@ -83,6 +83,9 @@ class OfferController extends Controller
                     foreach ($offer->getReviews() as $review){
                         $em->remove($review);
                     }
+                    foreach ($offer->getPromotions() as $promotion) {
+                        $em->remove($promotion);
+                    }
                     $em->remove($product);
                     $em->remove($offer);
                 }
@@ -122,6 +125,9 @@ class OfferController extends Controller
         $em=$this->getDoctrine()->getManager();
         foreach ($offer->getReviews() as $review){
             $em->remove($review);
+        }
+        foreach ($offer->getPromotions() as $promotion) {
+            $em->remove($promotion);
         }
         $em->remove($offer);
         $em->remove($offerProduct);

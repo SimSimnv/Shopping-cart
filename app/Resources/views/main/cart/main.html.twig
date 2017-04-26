@@ -8,7 +8,13 @@
             <a href="{{ path('cart_cancel',{'id':purchase.id}) }}">X</a>
             {{ purchase.title }}
             :
-            {{ purchase.price }}
+            {% set purchasePromo = calc.calculatePrice(purchase) %}
+
+            {% if purchasePromo != purchase.price %}
+                <del>{{ purchase.price }}</del>
+            {% endif %}
+            {{ purchasePromo | number_format(2) }}
+            {#{{ purchase.price }}#}
             &dollar;
         </p>
     {% endfor %}

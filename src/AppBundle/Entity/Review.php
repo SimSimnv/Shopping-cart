@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Review
  *
- * @ORM\Table(name="review")
+ * @ORM\Table(name="reviews")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ReviewRepository")
  */
 class Review
@@ -42,7 +42,17 @@ class Review
      */
     private $offer;
 
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="created_on", type="datetime")
+     */
+    private $createdOn;
 
+
+    public function __construct()
+    {
+        $this->createdOn=new \DateTime();
+    }
 
     /**
      * Get id
@@ -108,6 +118,22 @@ class Review
     public function setOffer(Offer $offer)
     {
         $this->offer = $offer;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedOn()
+    {
+        return $this->createdOn;
+    }
+
+    /**
+     * @param \DateTime $createdOn
+     */
+    public function setCreatedOn(\DateTime $createdOn)
+    {
+        $this->createdOn = $createdOn;
     }
 
 

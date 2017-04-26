@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
+use AppBundle\Entity\Promotion;
 use AppBundle\Entity\Review;
 use AppBundle\Entity\User;
 use AppBundle\Form\OfferType;
@@ -27,12 +28,14 @@ class OfferController extends Controller
     {
         $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
         $offers = $this->getDoctrine()->getRepository(Offer::class)->findAll();
+        $calc=$this->get('price_calculator');
         return $this->render(
             'main/offers/list.html.twig',
             [
                 'offers' => $offers,
                 'categories' => $categories,
-                'selected' => 'all'
+                'selected' => 'all',
+                'calc'=>$calc
             ]);
     }
 
@@ -45,12 +48,14 @@ class OfferController extends Controller
         $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
         $category = $this->getDoctrine()->getRepository(Category::class)->findBy(['name' => $name]);
         $offers = $this->getDoctrine()->getRepository(Offer::class)->findBy(['category' => $category]);
+        $calc=$this->get('price_calculator');
         return $this->render(
             'main/offers/list.html.twig',
             [
                 'offers' => $offers,
                 'categories' => $categories,
-                'selected' => $name
+                'selected' => $name,
+                'calc'=>$calc
             ]);
     }
 
@@ -88,9 +93,12 @@ class OfferController extends Controller
             }
         }
 
+
+        $calc=$this->get('price_calculator');
         return $this->render('main/offers/details.html.twig', [
             'offer' => $offer,
             'product' => $offer->getProduct(),
+            'calc'=>$calc,
             'cart_form' => $cartForm->createView(),
             'review_form' => $reviewForm->createView()
         ]);
@@ -131,6 +139,9 @@ class OfferController extends Controller
         $em = $this->getDoctrine()->getManager();
         foreach ($offer->getReviews() as $review) {
             $em->remove($review);
+        }
+        foreach ($offer->getPromotions() as $promotion) {
+            $em->remove($promotion);
         }
         $em->remove($offer);
         $em->remove($offerProduct);

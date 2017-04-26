@@ -6,6 +6,7 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
 use AppBundle\Entity\User;
+use AppBundle\Service\PriceCalculator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -32,6 +33,8 @@ class CartController extends Controller
         $form=$this->generateQuantitySelectForm($purchases);
         $form->handleRequest($request);
 
+        $calc=$this->get('price_calculator');
+
         if($form->isSubmitted() && $form->isValid()){
 
             $em=$this->getDoctrine()->getManager();
@@ -40,7 +43,7 @@ class CartController extends Controller
                 $purchase=$purchases->filter(function (Offer $purchase) use ($id){return $purchase->getId()==$id;})->first();
                 if($purchase!==false){
                     try{
-                        $this->buyProduct($purchase,$amount,$em);
+                        $this->buyProduct($purchase,$amount,$em, $calc);
                         $purchases->removeElement($purchase);
                     } catch (\Exception $e){
                         $this->addFlash('error',$e->getMessage());
@@ -56,6 +59,7 @@ class CartController extends Controller
 
         return $this->render('main/cart/main.html.twig', [
             'purchases'=>$purchases,
+            'calc'=>$calc,
             'cart_form'=>$form->createView()
         ]);
     }
@@ -76,14 +80,15 @@ class CartController extends Controller
         return $this->redirectToRoute('cart');
     }
 
-    private function buyProduct(Offer $offer, $amount,EntityManager $em)
+    private function buyProduct(Offer $offer, $amount,EntityManager $em, PriceCalculator $calc)
     {
         $product=$offer->getProduct();
         if($amount>$product->getQuantity()){
             throw new Exception('Invalid amount!');
         }
 
-        $price=$offer->getPrice()*$amount;
+        $finalPrice=$calc->calculatePrice($offer);
+        $price=$finalPrice*$amount;
 
         /**@var $user User**/
         $user=$this->getUser();
@@ -108,6 +113,9 @@ class CartController extends Controller
         if($product->getQuantity()==0){
             foreach ($offer->getReviews() as $review){
                 $em->remove($review);
+            }
+            foreach ($offer->getPromotions() as $promotion) {
+                $em->remove($promotion);
             }
             $em->remove($product);
             $em->remove($offer);

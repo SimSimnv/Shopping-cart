@@ -59,6 +59,9 @@ class CategoryController extends Controller
         }
 
         $em=$this->getDoctrine()->getManager();
+        foreach ($category->getPromotions() as $promotion) {
+            $em->remove($promotion);
+        }
         $em->remove($category);
         $em->flush();
 

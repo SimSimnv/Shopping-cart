@@ -5,12 +5,21 @@
     <div class="col-lg-12">
         <ul>
             {% for category in categories %}
-                <li>{{ category.name }} | <a href="{{ path('categories_remove',{'id':category.id}) }}">Remove</a></li>
+                <li>
+                    {{ category.name }}
+                    |
+                    <a href="{{ path('categories_remove',{'id':category.id}) }}">Remove</a>
+                    |
+                    <a href="{{ path('admin_category_promotion',{'id':category.id}) }}">Add promotion</a>
+                </li>
             {% endfor %}
         </ul>
     <div>
         <a href="{{ path('categories_create') }}" class="btn btn-default">Add category</a>
     </div>
+        <div>
+            <a href="{{ path('admin_general_promotion') }}" class="btn btn-default">Make general promotion</a>
+        </div>
     </div>
     </div>
 {% endblock %}
