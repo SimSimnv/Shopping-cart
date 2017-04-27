@@ -22,10 +22,26 @@ class OfferController extends Controller
     /**
      * @Route("/", name="admin_offers_list")
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        $offers=$this->getDoctrine()->getRepository(Offer::class)->findAll();
-        return $this->render('administration/offers/list.html.twig',['offers'=>$offers]);
+        $paginator=$this->get('knp_paginator');
+        $query=$this
+            ->getDoctrine()
+            ->getRepository(Offer::class)
+            ->createQueryBuilder('o')
+            ->select('o');
+
+        $pagination=$paginator->paginate(
+            $query->getQuery(),
+            $request->query->getInt('page', 1),
+            10
+        );
+
+        $calc=$this->get('price_calculator');
+        return $this->render('administration/offers/list.html.twig',[
+            'pagination'=>$pagination,
+            'calc'=>$calc
+        ]);
     }
 
     /**
@@ -97,10 +113,11 @@ class OfferController extends Controller
             $this->addFlash('success','Offer edited!');
             return $this->redirectToRoute('admin_offers_list');
         }
-
+        $calc=$this->get('price_calculator');
         return $this->render('administration/offers/edit.html.twig',[
             'offer'=>$offer,
             'product'=>$product,
+            'calc'=>$calc,
             'edit_form'=>$editorForm->createView()
         ]);
     }

@@ -3,36 +3,51 @@
 {% block content %}
     <div class="box">
     <div class="col-lg-12">
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Offers</strong></h2>
+            <hr>
+        </div>
+        <div class="col-lg-8 col-lg-offset-2 ">
+            <table class="table table-bordered admin-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Publisher</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for offer in pagination %}
+                    <tr>
+                        <td>{{ offer.title }}</td>
+                        <td>
+                            {% set offerPromo = calc.calculatePrice(offer) %}
 
-    <table border="1" cellpadding="0" cellspacing="0">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Publisher</th>
-            <th>Category</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for offer in offers %}
-            <tr>
-                <td>{{ offer.title }}</td>
-                <td>{{ offer.price }}</td>
-                <td>{{ offer.user.username }}</td>
-                <td>{{ offer.category.name }}</td>
-                <td>
-                    <a href="{{ path('admin_offers_edit',{'id':offer.id}) }}">Edit</a> 
-                    | 
-                    <a href="{{ path('admin_offers_remove',{'id':offer.id}) }}">Remove</a>
-                    |
-                    <a href="{{ path('admin_offer_promotion',{'id':offer.id}) }}">Add promotion</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
+                            {% if offerPromo != offer.price %}
+                                <del>{{ offer.price }}</del>
+                            {% endif %}
+                            {{ offerPromo | number_format(2) }}
+                        </td>
+                        <td>{{ offer.user.username }}</td>
+                        <td>{{ offer.category.name }}</td>
+                        <td>
+                            <a href="{{ path('admin_offers_edit',{'id':offer.id}) }}">Edit</a>
+                            |
+                            <a href="{{ path('admin_offers_remove',{'id':offer.id}) }}">Remove</a>
+                            |
+                            <a href="{{ path('admin_offer_promotion',{'id':offer.id}) }}">Add promotion</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="navigation text-center">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div>
     </div>
     </div>
 {% endblock %}

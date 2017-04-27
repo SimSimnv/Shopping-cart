@@ -1,9 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" );
 @import url("https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic");
 
+
 body{
-    /background: url('../img/background.jpeg') no-repeat center center fixed;
+    /background: url('../img/bg.jpg') no-repeat center center fixed;
     background: linear-gradient(to right, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+
 }
 .navbar-nav li a{
     letter-spacing: normal;
@@ -51,3 +53,33 @@ form input{
 .admin-page{
     background: linear-gradient(to right, #649173, #dbd5a4);
 }
+
+
+.review-section{
+    margin-top: 20px;
+}
+.my-product tr{
+    background-color: #f9f9f9;;
+}
+
+.admin-table tr{
+    background-color: #fcfcfc;
+    margin-top: 20px;
+}
+
+#app_bundle_cart_type_purchases label{
+    display: none;
+}
+
+.purchase-item{
+
+    position: relative;
+    min-height: 50px;
+}
+.purchase-info{
+    position: absolute;
+    top: -1px;
+    left: 46px;
+}
+
+

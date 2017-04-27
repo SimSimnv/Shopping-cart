@@ -3,19 +3,44 @@
 {% block content %}
     <div class="box">
     <div class="col-lg-12">
-        <ul>
-            {% for user in users %}
-                <li>
-                    {{ user.username }}
-                    -
-                    {{ user.highestRole }}
-                    -
-                    <a href="{{ path('admin_users_edit',{'id':user.id}) }}">Edit</a>
-                    |
-                    <a href="{{ path('admin_users_products',{'id':user.id}) }}">Manage Products</a>
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Users</strong></h2>
+            <hr>
+        </div>
 
-                </li>
-            {% endfor %}
+
+        <div class="col-lg-8 col-lg-offset-2 ">
+            <table class="table table-bordered admin-table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.highestRole }}</td>
+                        <td>
+                            <a href="{{ path('admin_users_edit',{'id':user.id}) }}">Edit</a>
+                            |
+                            <a href="{{ path('admin_users_products',{'id':user.id}) }}">Manage Products</a>
+                            |
+                            {% if user.banned %}
+                                <a href="{{ path('admin_users_unban',{'id':user.id}) }}">Unban</a>
+                            {% else %}
+                                <a href="{{ path('admin_users_ban',{'id':user.id}) }}">Ban</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
         </ul>
     </div>
     </div>

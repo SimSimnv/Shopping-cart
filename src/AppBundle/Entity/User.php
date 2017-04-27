@@ -94,7 +94,12 @@ class User implements UserInterface
      */
     private $reviews;
 
-
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_banned", type="boolean")
+     */
+    private $isBanned;
 
     public  function __construct()
     {
@@ -103,6 +108,7 @@ class User implements UserInterface
         $this->offers=new ArrayCollection();
         $this->purchases=new ArrayCollection();
         $this->reviews=new ArrayCollection();
+        $this->isBanned=false;
     }
 
 
@@ -356,6 +362,22 @@ class User implements UserInterface
     public function setReviews($reviews)
     {
         $this->reviews = $reviews;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBanned()
+    {
+        return $this->isBanned;
+    }
+
+    /**
+     * @param bool $isBanned
+     */
+    public function setBanned(bool $isBanned)
+    {
+        $this->isBanned = $isBanned;
     }
 
 

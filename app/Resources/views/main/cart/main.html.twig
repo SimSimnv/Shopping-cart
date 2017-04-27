@@ -2,37 +2,60 @@
 
 {% block content %}
     <div class="box">
-    <div class="col-lg-12">
-    {% for purchase in purchases %}
-        <p>
-            <a href="{{ path('cart_cancel',{'id':purchase.id}) }}">X</a>
-            {{ purchase.title }}
-            :
-            {% set purchasePromo = calc.calculatePrice(purchase) %}
+    <div class="col-lg-6 col-lg-offset-3">
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Total: <span class="cart-total">0&dollar;</span></strong></h2>
+            <hr>
+        </div>
+        {% if purchases is empty %}
+            <div class=" text-center row">
+                <h3 class="intro-text">No purchases</h3>
+                <a href="{{ path('offers_list') }}" class="btn btn-primary">Go shop!</a>
+            </div>
+        {% else %}
 
-            {% if purchasePromo != purchase.price %}
-                <del>{{ purchase.price }}</del>
-            {% endif %}
-            {{ purchasePromo | number_format(2) }}
-            {#{{ purchase.price }}#}
-            &dollar;
-        </p>
-    {% endfor %}
+            <div class="col-lg-6 ">
+                <input type="hidden" value="{{ app.user.money }}" class="user-money">
+                {% for purchase in purchases %}
+                    <div class="purchase-item">
+                        <a href="{{ path('cart_cancel',{'id':purchase.id}) }}" class="btn btn-danger">X</a>
 
+                        <div class="purchase-info">
+                            <div>
+                                <a href="{{ path('offers_details',{'id':purchase.id}) }}">{{ purchase.title }}</a>
+                                :
+                                {{ calc.calculatePrice(purchase) | number_format(2) }}
+                                &dollar;
+                            </div>
+                            <div>Available amount: {{ purchase.product.quantity }}</div>
+                            <input type="hidden" value="{{ calc.calculatePrice(purchase)  }}" class="purchase-price">
+                        </div>
 
-    {{ form_start(cart_form) }}
-    {{ form_label(cart_form) }}
-    {{ form_errors(cart_form) }}
-    <ul>
-        {% for row in cart_form %}
-            <li>
-                {{ form_errors(row) }}
-                {{ form_widget(row) }}
-            </li>
-        {% endfor %}
-    </ul>
-    <input type="submit" value="Checkout">
-    {{ form_end(cart_form) }}
+                    </div>
+
+                {% endfor %}
+            </div>
+
+            <div class="col-lg-6">
+                {% form_theme cart_form 'bootstrap_3_layout.html.twig' %}
+                {{ form_start(cart_form) }}
+                {{ form_errors(cart_form) }}
+                {% for row in cart_form %}
+                    <p>
+                        {{ form_row(row) }}
+                    </p>
+                {% endfor %}
+                <input type="submit" value="Checkout" class="btn btn-success">
+                {{ form_end(cart_form) }}
+            </div>
+        {% endif %}
+
     </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/cart.js') }}"></script>
 {% endblock %}

@@ -103,4 +103,62 @@ class UserController extends Controller
             $user->removeRole($editorRole);
         }
     }
+
+    /**
+     * @Route("/{id}/ban", name="admin_users_ban")
+     */
+    public function banUser(Request $request, User $user)
+    {
+        if($user->isBanned()==true){
+            $this->addFlash('error','User is already banned');
+            return $this->redirectToRoute('admin_users_list');
+        }
+        $banForm = $this->createFormBuilder([])->getForm();
+        $banForm->handleRequest($request);
+        
+        if($banForm->isSubmitted() && $banForm->isValid()){
+            $em=$this->getDoctrine()->getManager();
+            foreach ($user->getOffers() as $offer) {
+                $offer->setUser($this->getUser());
+            }
+            foreach ($user->getProducts() as $product) {
+                $product->setUser($this->getUser());
+            }
+            $user->setBanned(true);
+            $em->flush();
+            $this->addFlash('success','User '.$user->getUsername().' banned');
+            return $this->redirectToRoute('admin_users_list');
+        }
+
+        return $this->render('administration/users/ban.html.twig',[
+            'user'=>$user,
+            'ban_form'=>$banForm->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/unban", name="admin_users_unban")
+     */
+    public function unBan(Request $request, User $user)
+    {
+        if($user->isBanned()==false){
+            $this->addFlash('error','User is not banned');
+            return $this->redirectToRoute('admin_users_list');
+        }
+        $unBanForm = $this->createFormBuilder([])->getForm();
+        $unBanForm->handleRequest($request);
+
+        if ($unBanForm->isSubmitted() && $unBanForm->isValid()){
+            $em=$this->getDoctrine()->getManager();
+            $user->setBanned(false);
+            $em->flush();
+            $this->addFlash('success','User '.$user->getUsername().' unbanned');
+            return $this->redirectToRoute('admin_users_list');
+        }
+
+        return $this->render('administration/users/unban.html.twig',[
+            'user'=>$user,
+            'unban_form'=>$unBanForm->createView()
+        ]);
+    }
 }

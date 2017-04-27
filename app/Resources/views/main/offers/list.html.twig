@@ -29,12 +29,13 @@
                 <h2 class="intro-text text-center">{{ selected }}</h2>
                 <hr>
             </div>
-            {% if offers is empty %}
+            {% if pagination is empty %}
                 <div class="col-lg-12">
                     <h3 class="text-center"><strong>No offers found</strong></h3>
                 </div>
             {% else %}
-                {% for offer in offers %}
+                <div class="row">
+                {% for offer in pagination %}
                     <div class="col-sm-4 text-center">
                         <div class="offer-item">
                             <a href="{{ path('offers_details',{'id':offer.id}) }}">
@@ -48,13 +49,14 @@
                                     <del>{{ offer.price }}</del>
                                 {% endif %}
                                 {{ offerPromo | number_format(2) }}
-
-
-                                {#{{ offer.price }} &dollar;#}
                             </p>
                         </div>
                     </div>
                 {% endfor %}
+                </div>
+                <div class="navigation text-center">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
             {% endif %}
             <div class="clearfix"></div>
         </div>

@@ -1,0 +1,51 @@
+{% extends "administration/base.html.twig" %}
+
+{% block content %}
+    <div class="box">
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Promotions</strong></h2>
+            <hr>
+        </div>
+        <div class="col-lg-6 col-lg-offset-3">
+            <table class="table table-bordered admin-table">
+                <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Percent</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for promotion in promotions %}
+                    <tr>
+                        <td>
+                            {% if promotion.category  %}
+                                Category: {{ promotion.category.name }}
+                            {% elseif promotion.offer %}
+                                Offer: {{ promotion.offer.title }}
+                            {% else %}
+                                General
+                            {% endif %}
+                        </td>
+                        <td>{{ promotion.percent }}</td>
+                        <td>{{ promotion.startDate|date('d-m-Y') }}</td>
+                        <td>{{ promotion.endDate|date('d-m-Y') }}</td>
+                        <td>
+                            <a href="{{ path('admin_promotions_edit',{'id':promotion.id}) }}">Edit</a>
+                            |
+                            <a href="{{ path('admin_promotions_remove',{'id':promotion.id}) }}">Remove</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-12 text-center">
+            <a href="{{ path('admin_general_promotion') }}" class="btn btn-default">Make general promotion</a>
+        </div>
+    </div>
+{% endblock %}

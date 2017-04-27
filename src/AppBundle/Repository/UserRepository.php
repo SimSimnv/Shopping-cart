@@ -19,6 +19,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository implements UserLoade
             ->where('u.username = :username')
             ->orWhere('u.email = :username')
             ->setParameter('username',$username)
+            ->andWhere('u.isBanned = false')
             ->getQuery();
 
         return $query->setMaxResults(1)->getOneOrNullResult();

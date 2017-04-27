@@ -18,6 +18,16 @@ use Symfony\Component\HttpFoundation\Request;
 class PromotionController extends Controller
 {
     /**
+     * @Route("/promotions", name="promotions_list")
+     */
+    public function listAction()
+    {
+        $promotions=$this->getDoctrine()->getRepository(Promotion::class)->findAll();
+
+        return $this->render('administration/promotions/list.html.twig',['promotions'=>$promotions]);
+    }
+
+    /**
      * @Route("/offers/{id}/promotion", name="admin_offer_promotion")
      */
     public function offerAction(Request $request, Offer $offer)
@@ -108,11 +118,49 @@ class PromotionController extends Controller
             $em->persist($promotion);
             $em->flush();
             $this->addFlash('success','Promotion created!');
-            return $this->redirectToRoute('categories_list');
+            return $this->redirectToRoute('promotions_list');
         }
 
         return $this->render('administration/promotions/general.html.twig', [
             'promo_form' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/promotions/{id}/remove", name="admin_promotions_remove")
+     */
+    public function removeAction(Promotion $promotion)
+    {
+        $em=$this->getDoctrine()->getManager();
+        $em->remove($promotion);
+        $em->flush();
+        $this->addFlash('success','Promotion removed');
+        return $this->redirectToRoute('promotions_list');
+    }
+
+    /**
+     * @Route("/promotions/{id}/edit", name="admin_promotions_edit")
+     */
+    public function editAction(Request $request, Promotion $promotion)
+    {
+        $form=$this->createForm(PromotionType::class,$promotion);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $today=(new \DateTime())->format('d-m-Y');
+            $startDate=$promotion->getStartDate()->format('d-m-Y');
+            $endDate=$promotion->getEndDate()->format('d-m-Y');
+            if($startDate<$today || $endDate<$today || $endDate<=$startDate){
+                $this->addFlash('error','Enter valid time range!');
+                return $this->render('administration/promotions/edit.html.twig', [
+                    'edit_form' => $form->createView(),
+                ]);
+            }
+            $em=$this->getDoctrine()->getManager();
+            $em->flush();
+            $this->addFlash('success','Promotion edited!');
+            return $this->redirectToRoute('promotions_list');
+        }
+        return $this->render('administration/promotions/edit.html.twig',['edit_form'=>$form->createView()]);
     }
 }

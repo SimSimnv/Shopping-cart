@@ -65,7 +65,7 @@ class Offer
      */
     private $product;
 
-    private $quantity;
+    private $quantity=1;
 
     /**
      * @var Category

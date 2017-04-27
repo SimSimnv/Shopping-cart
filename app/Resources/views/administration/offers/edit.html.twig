@@ -2,14 +2,51 @@
 
 {% block content %}
     <div class="box">
+
+        <div class="my-product">
+            <div class="col-md-6">
+                <img class="img-responsive img-border-left" src="{{ asset('uploads/products/'~offer.product.image) }}" alt="product-img">
+            </div>
+            <div class="col-md-6 text-center">
+                <hr>
+                <h2 class="intro-text">
+                    <strong>{{ offer.title }}</strong>
+                </h2>
+                <hr>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Product</th>
+                        <td>{{ offer.product.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <td>{{ offer.product.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td>
+                            {% set offerPromo = calc.calculatePrice(offer) %}
+
+                            {% if offerPromo != offer.price %}
+                                <del>{{ offer.price }}</del>
+                            {% endif %}
+                            {{ offerPromo | number_format(2) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ offer.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Publisher</th>
+                        <td><a href="{{ path('user_profile',{'name':offer.user.username}) }}">{{ offer.user.username }}</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
     <div class="col-lg-6 col-lg-offset-3">
-        <ul>
-            <li>{{ offer.title }}</li>
-            <li>Product name: {{ product.name }}</li>
-            <li>Price: {{ offer.price }}</li>
-            <li>{{ offer.description }}</li>
-            <li>Publisher: {{ offer.user.username }}</li>
-        </ul>
     {% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
         {{ form_start(edit_form) }}
         {{ form_widget(edit_form) }}

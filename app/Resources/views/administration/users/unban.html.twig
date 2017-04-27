@@ -1,0 +1,17 @@
+{% extends 'administration/base.html.twig' %}
+
+{% block content %}
+    <div class="box">
+        <div class="col-lg-12">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Confirm {{ user.username }} unban!</strong></h2>
+            <hr>
+        </div>
+        <div class="col-lg-6 col-lg-offset-3">
+            {{ form_start(unban_form) }}
+            <input type="submit" value="Unban user" class="btn btn-success">
+            {{ form_end(unban_form) }}
+        </div>
+    </div>
+
+{% endblock %}
