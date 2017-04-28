@@ -1,35 +1,46 @@
 {% extends 'main/base.html.twig' %}
 
 {% block content %}
-    <div class="row">
-        <div class="box">
-            <div class="col-lg-12">
-                <hr>
-                <h2 class="intro-text text-center">Test Test
-                    <strong>test test</strong>
-                </h2>
-                <hr>
-                <img class="img-responsive img-border img-left" src="{{ asset('img/intro-pic.jpg') }}" alt="">
-                <hr class="visible-xs">
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid incidunt iure porro vero. Assumenda eligendi ipsa ipsam ipsum laudantium modi officiis provident quam, quos reiciendis rerum similique temporibus voluptatibus! Quibusdam..</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, cum delectus ea exercitationem facilis fuga in iste magni, minus nemo, nisi obcaecati praesentium quibusdam quo quod repellat saepe soluta voluptas.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc placerat diam quis nisl vestibulum dignissim. In hac habitasse platea dictumst. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-            </div>
+
+    <div class="box">
+        <div class="row">
+            <hr>
+            <h2 class="intro-text text-center"><strong>Welcome to the site</strong></h2>
+            <hr>
+        </div>
+        <div class="row">
+            <hr>
+            <h2 class="intro-text text-center">Featured offers</h2>
+            <hr>
+            {% if offers is empty %}
+                <div class="col-lg-12">
+                    <h3 class="text-center"><strong>No offers featured</strong></h3>
+                </div>
+            {% else %}
+                <div class="col-lg-8 col-lg-offset-2">
+                    {% for offer in offers %}
+                        <div class="col-sm-3 text-center">
+                            <div class="offer-item">
+                                <a href="{{ path('offers_details',{'id':offer.id}) }}">
+                                    <img class="img-responsive" src="{{ asset('uploads/products/'~offer.product.image) }}" alt="product-img">
+                                </a>
+                                <h4>{{ offer.title }}</h4>
+                                <p>
+                                    {% set offerPromo = calc.calculatePrice(offer) %}
+
+                                    {% if offerPromo != offer.price %}
+                                        <del>{{ offer.price }}</del>
+                                    {% endif %}
+                                    {{ offerPromo | number_format(2) }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% endif %}
         </div>
     </div>
 
-    <div class="row">
-        <div class="box">
-            <div class="col-lg-12">
-                <hr>
-                <h2 class="intro-text text-center">Test
-                    <strong>test test</strong>
-                </h2>
-                <hr>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid aut deleniti, dolorum facere harum itaque maiores nam nesciunt perspiciatis quis, recusandae rerum tempora unde! Deleniti hic ipsum nihil omnis quidem.</p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc placerat diam quis nisl vestibulum dignissim. In hac habitasse platea dictumst. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 

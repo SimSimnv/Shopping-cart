@@ -15,14 +15,16 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CategoryController extends Controller
 {
-    const BASE_CATEGORY='Other';
+    const BASE_CATEGORY = 'Other';
+
     /**
      * @Route("/", name="categories_list")
      */
     public function indexAction()
     {
-        $categories=$this->getDoctrine()->getRepository(Category::class)->findAll();
-        return $this->render('administration/categories/list.html.twig',['categories'=>$categories]);
+        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
+
+        return $this->render('administration/categories/list.html.twig', ['categories' => $categories]);
     }
 
     /**
@@ -30,42 +32,46 @@ class CategoryController extends Controller
      */
     public function createAction(Request $request)
     {
-        $category=new Category();
-        $form=$this->createForm(CategoryType::class,$category);
+        $category = new Category();
+        $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()){
-            $em=$this->getDoctrine()->getManager();
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             $em->persist($category);
             $em->flush();
-            $this->addFlash('success','Category created!');
+            $this->addFlash('success', 'Category created!');
             return $this->redirectToRoute('categories_list');
         }
-        return $this->render('administration/categories/create.html.twig',['form_create'=>$form->createView()]);
+
+        return $this->render('administration/categories/create.html.twig', ['form_create' => $form->createView()]);
     }
+
     /**
      * @Route("/{id}/remove", name="categories_remove")
      */
     public function removeAction(Category $category)
     {
-        if($category->getName()==self::BASE_CATEGORY){
-            $this->addFlash('error','Cannot delete the base category!');
+        if ($category->getName() == self::BASE_CATEGORY) {
+            $this->addFlash('error', 'Cannot delete the base category!');
             return $this->redirectToRoute('categories_list');
         }
-        $offers=$category->getOffers();
-        $defaultCategory=$this->getDoctrine()->getRepository(Category::class)->findOneBy(['name'=>self::BASE_CATEGORY]);
 
-        foreach ($offers as $offer){
+        $offers = $category->getOffers();
+        $defaultCategory = $this->getDoctrine()->getRepository(Category::class)->findOneBy(['name' => self::BASE_CATEGORY]);
+
+        foreach ($offers as $offer) {
             $offer->setCategory($defaultCategory);
         }
 
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         foreach ($category->getPromotions() as $promotion) {
             $em->remove($promotion);
         }
         $em->remove($category);
         $em->flush();
 
-        $this->addFlash('success','Category removed!');
+        $this->addFlash('success', 'Category removed!');
         return $this->redirectToRoute('categories_list');
     }
 

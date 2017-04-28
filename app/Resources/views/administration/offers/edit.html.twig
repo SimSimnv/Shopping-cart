@@ -49,9 +49,11 @@
     <div class="col-lg-6 col-lg-offset-3">
     {% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
         {{ form_start(edit_form) }}
-        {{ form_widget(edit_form) }}
+        {{ form_row(edit_form.category) }}
+        {{ form_row(edit_form.quantity) }}
+        {{ form_row(edit_form.isFeatured) }}
         <input type="submit" value="Edit!" formnovalidate class="btn btn-default">
-        {{ form_end(edit_form, {'render_rest': false}) }}
+        {{ form_end(edit_form) }}
     </div>
     </div>
 

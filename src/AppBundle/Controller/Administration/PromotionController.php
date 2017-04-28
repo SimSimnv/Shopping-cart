@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
+
 /**
  * @Security("has_role('ROLE_EDITOR')")
  * @Route("/administration")
@@ -22,9 +23,9 @@ class PromotionController extends Controller
      */
     public function listAction()
     {
-        $promotions=$this->getDoctrine()->getRepository(Promotion::class)->findAll();
+        $promotions = $this->getDoctrine()->getRepository(Promotion::class)->findAll();
 
-        return $this->render('administration/promotions/list.html.twig',['promotions'=>$promotions]);
+        return $this->render('administration/promotions/list.html.twig', ['promotions' => $promotions]);
     }
 
     /**
@@ -37,27 +38,28 @@ class PromotionController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $today=(new \DateTime())->format('d-m-Y');
-            $startDate=$promotion->getStartDate()->format('d-m-Y');
-            $endDate=$promotion->getEndDate()->format('d-m-Y');
-            if($startDate<$today || $endDate<$today || $endDate<=$startDate){
-                $this->addFlash('error','Enter valid time range!');
+            $storeManager = $this->get('store_manager');
+
+            if (!$storeManager->areDatesValid($promotion)) {
+                $this->addFlash('error', 'Enter valid time range!');
                 return $this->render('administration/promotions/offer.html.twig', [
                     'promo_form' => $form->createView(),
-                    'offer'=>$offer
+                    'offer' => $offer
                 ]);
             }
+
             $promotion->setOffer($offer);
-            $em=$this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
             $em->persist($promotion);
             $em->flush();
-            $this->addFlash('success','Promotion added!');
+            $this->addFlash('success', 'Promotion added!');
+
             return $this->redirectToRoute('admin_offers_list');
         }
 
         return $this->render('administration/promotions/offer.html.twig', [
             'promo_form' => $form->createView(),
-            'offer'=>$offer
+            'offer' => $offer
         ]);
     }
 
@@ -71,27 +73,27 @@ class PromotionController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $today=(new \DateTime())->format('d-m-Y');
-            $startDate=$promotion->getStartDate()->format('d-m-Y');
-            $endDate=$promotion->getEndDate()->format('d-m-Y');
-            if($startDate<$today || $endDate<$today || $endDate<=$startDate){
-                $this->addFlash('error','Enter valid time range!');
+            $storeManager = $this->get('store_manager');
+            if (!$storeManager->areDatesValid($promotion)) {
+                $this->addFlash('error', 'Enter valid time range!');
                 return $this->render('administration/promotions/category.html.twig', [
                     'promo_form' => $form->createView(),
-                    'category'=>$category
+                    'category' => $category
                 ]);
             }
+
             $promotion->setCategory($category);
-            $em=$this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
             $em->persist($promotion);
             $em->flush();
-            $this->addFlash('success','Promotion added!');
+            $this->addFlash('success', 'Promotion added!');
+
             return $this->redirectToRoute('categories_list');
         }
 
         return $this->render('administration/promotions/category.html.twig', [
             'promo_form' => $form->createView(),
-            'category'=>$category
+            'category' => $category
         ]);
     }
 
@@ -105,19 +107,20 @@ class PromotionController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $today=(new \DateTime())->format('d-m-Y');
-            $startDate=$promotion->getStartDate()->format('d-m-Y');
-            $endDate=$promotion->getEndDate()->format('d-m-Y');
-            if($startDate<$today || $endDate<$today || $endDate<=$startDate){
-                $this->addFlash('error','Enter valid time range!');
+            $storeManager = $this->get('store_manager');
+
+            if (!$storeManager->areDatesValid($promotion)) {
+                $this->addFlash('error', 'Enter valid time range!');
                 return $this->render('administration/promotions/general.html.twig', [
                     'promo_form' => $form->createView()
                 ]);
             }
-            $em=$this->getDoctrine()->getManager();
+
+            $em = $this->getDoctrine()->getManager();
             $em->persist($promotion);
             $em->flush();
-            $this->addFlash('success','Promotion created!');
+            $this->addFlash('success', 'Promotion created!');
+
             return $this->redirectToRoute('promotions_list');
         }
 
@@ -131,10 +134,11 @@ class PromotionController extends Controller
      */
     public function removeAction(Promotion $promotion)
     {
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $em->remove($promotion);
         $em->flush();
-        $this->addFlash('success','Promotion removed');
+        $this->addFlash('success', 'Promotion removed');
+
         return $this->redirectToRoute('promotions_list');
     }
 
@@ -143,24 +147,26 @@ class PromotionController extends Controller
      */
     public function editAction(Request $request, Promotion $promotion)
     {
-        $form=$this->createForm(PromotionType::class,$promotion);
+        $form = $this->createForm(PromotionType::class, $promotion);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
-            $today=(new \DateTime())->format('d-m-Y');
-            $startDate=$promotion->getStartDate()->format('d-m-Y');
-            $endDate=$promotion->getEndDate()->format('d-m-Y');
-            if($startDate<$today || $endDate<$today || $endDate<=$startDate){
-                $this->addFlash('error','Enter valid time range!');
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $storeManager = $this->get('store_manager');
+
+            if (!$storeManager->areDatesValid($promotion)) {
+                $this->addFlash('error', 'Enter valid time range!');
                 return $this->render('administration/promotions/edit.html.twig', [
                     'edit_form' => $form->createView(),
                 ]);
             }
-            $em=$this->getDoctrine()->getManager();
+
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
-            $this->addFlash('success','Promotion edited!');
+            $this->addFlash('success', 'Promotion edited!');
             return $this->redirectToRoute('promotions_list');
         }
-        return $this->render('administration/promotions/edit.html.twig',['edit_form'=>$form->createView()]);
+
+        return $this->render('administration/promotions/edit.html.twig', ['edit_form' => $form->createView()]);
     }
 }

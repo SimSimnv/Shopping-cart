@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+
 /**
  * OfferRepository
  *
@@ -10,4 +11,11 @@ namespace AppBundle\Repository;
  */
 class OfferRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getSortedQuery()
+    {
+        return $this
+            ->createQueryBuilder('o')
+            ->select('o')
+            ->orderBy('o.createdOn','DESC');
+    }
 }

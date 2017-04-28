@@ -6,6 +6,7 @@ namespace AppBundle\Controller\Administration;
 use AppBundle\Entity\Offer;
 use AppBundle\Entity\Product;
 use AppBundle\Entity\User;
+use AppBundle\Form\OfferEditType;
 use AppBundle\Form\OfferType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -25,14 +26,9 @@ class OfferController extends Controller
     public function indexAction(Request $request)
     {
         $paginator=$this->get('knp_paginator');
-        $query=$this
-            ->getDoctrine()
-            ->getRepository(Offer::class)
-            ->createQueryBuilder('o')
-            ->select('o');
 
         $pagination=$paginator->paginate(
-            $query->getQuery(),
+            $this->getDoctrine()->getRepository(Offer::class)->getSortedQuery(),
             $request->query->getInt('page', 1),
             10
         );
@@ -52,12 +48,7 @@ class OfferController extends Controller
         $product=$offer->getProduct();
         $offer->setQuantity($product->getQuantity());
 
-        $editorForm=$this->createForm(OfferType::class,$offer);
-        $editorForm
-            ->remove('price')
-            ->remove('title')
-            ->remove('description');
-
+        $editorForm=$this->createForm(OfferEditType::class,$offer);
         $quantity=[];
         for ($i=1; $i<=$product->getQuantity(); $i++){
             $quantity[$i]=$i;
@@ -70,7 +61,6 @@ class OfferController extends Controller
                 'choices'=>$quantity,
             ]
         );
-
         $editorForm->handleRequest($request);
 
         if($editorForm->isSubmitted() && $editorForm->isValid()){
@@ -80,18 +70,15 @@ class OfferController extends Controller
                 return $this->redirectToRoute('admin_offers_edit');
             }
 
+            $storeManager=$this->get('store_manager');
             $em=$this->getDoctrine()->getManager();
 
             $returnedQuantity=$product->getQuantity()-$offerQuantity;
             if($returnedQuantity>0){
                 /**@var  User**/
                 $productOwner=$offer->getUser();
-                $returnedProduct=new Product();
-                $returnedProduct->setName($product->getName());
-                $returnedProduct->setQuantity($returnedQuantity);
-                $returnedProduct->setImage($product->getImage());
-                $returnedProduct->setUser($productOwner);
-                $productOwner->addProduct($returnedProduct);
+
+                $returnedProduct=$storeManager->cloneProduct($product,$productOwner,$returnedQuantity);
                 $em->persist($returnedProduct);
 
                 $product->reduceQuantity($returnedQuantity);
@@ -114,6 +101,7 @@ class OfferController extends Controller
             return $this->redirectToRoute('admin_offers_list');
         }
         $calc=$this->get('price_calculator');
+
         return $this->render('administration/offers/edit.html.twig',[
             'offer'=>$offer,
             'product'=>$product,
@@ -129,28 +117,26 @@ class OfferController extends Controller
     {
         /**@var $user User**/
         $user=$offer->getUser();
+        $storeManager=$this->get('store_manager');
+        $em=$this->getDoctrine()->getManager();
 
         $offerProduct=$offer->getProduct();
 
-        $userProduct=new Product();
-        $userProduct->setName($offerProduct->getName());
-        $userProduct->setQuantity($offerProduct->getQuantity());
-        $userProduct->setImage($offerProduct->getImage());
-        $userProduct->setUser($user);
+        $userProduct=$storeManager->cloneProduct($offerProduct,$user,$offerProduct->getQuantity());
 
-        $user->addProduct($userProduct);
-        $em=$this->getDoctrine()->getManager();
         foreach ($offer->getReviews() as $review){
             $em->remove($review);
         }
         foreach ($offer->getPromotions() as $promotion) {
             $em->remove($promotion);
         }
+
         $em->remove($offer);
         $em->remove($offerProduct);
         $em->persist($userProduct);
         $em->flush();
         $this->addFlash('success','Offer canceled');
+
         return $this->redirectToRoute('admin_offers_list');
     }
 }

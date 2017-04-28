@@ -25,33 +25,31 @@ class CartController extends Controller
     public function indexAction(Request $request)
     {
 
-        /**@var $user User**/
-        $user=$this->getUser();
-        $purchases=$user->getPurchases();
-        $cart=new Cart();
-        $cart->setPurchases($purchases);
-        $cartForm= $this->createForm(CartType::class,$cart);
+        /**@var $user User* */
+        $user = $this->getUser();
+        $purchases = $user->getPurchases();
 
+        $cart = new Cart();
+        $cart->setPurchases($purchases);
+        $cartForm = $this->createForm(CartType::class, $cart);
         $cartForm->handleRequest($request);
 
-        $calc=$this->get('price_calculator');
 
-        if($cartForm->isSubmitted() && $cartForm->isValid()){
-            try{
+        if ($cartForm->isSubmitted() && $cartForm->isValid()) {
+            try {
                 $this->cartTransaction($cart);
-            }
-            catch (\Exception $e){
-                $this->addFlash('error',$e->getMessage());
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
             }
         }
 
+        $calc = $this->get('price_calculator');
         return $this->render('main/cart/main.html.twig', [
-            'purchases'=>$purchases,
-            'calc'=>$calc,
-            'cart_form'=>$cartForm->createView()
+            'purchases' => $purchases,
+            'calc' => $calc,
+            'cart_form' => $cartForm->createView()
         ]);
     }
-
 
 
     /**
@@ -60,55 +58,49 @@ class CartController extends Controller
      */
     public function cancelAction(Offer $purchase)
     {
-        /**@var $user User**/
-        $user=$this->getUser();
-        $purchases=$user->getPurchases();
+        /**@var $user User* */
+        $user = $this->getUser();
+        $purchases = $user->getPurchases();
         $purchases->removeElement($purchase);
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $em->flush();
-        $this->addFlash('success','Purchase removed!');
+        $this->addFlash('success', 'Purchase removed!');
         return $this->redirectToRoute('cart');
     }
 
     private function cartTransaction(Cart $cart)
     {
-        $calc=$this->get('price_calculator');
-        $em=$this->getDoctrine()->getManager();
-        $userPurchases=$this->getUser()->getPurchases();
+        $storeManager = $this->get('store_manager');
+        $calc = $this->get('price_calculator');
+        $em = $this->getDoctrine()->getManager();
+        $userPurchases = $this->getUser()->getPurchases();
 
 
-        foreach ($cart->getPurchases() as $offer){
-            $product=$offer->getProduct();
-            $amount=$offer->getQuantity();
-            if($amount>$product->getQuantity() || $amount<1){
+        foreach ($cart->getPurchases() as $offer) {
+            /**@var $user User* */
+            $user = $this->getUser();
+            $product = $offer->getProduct();
+            $amount = $offer->getQuantity();
+
+            if ($amount > $product->getQuantity() || $amount < 1) {
                 throw new Exception('Invalid amount!');
             }
 
-            $finalPrice=$calc->calculatePrice($offer);
-            $price=$finalPrice*$amount;
+            $finalPrice = $calc->calculatePrice($offer);
+            $price = $finalPrice * $amount;
 
-            /**@var $user User**/
-            $user=$this->getUser();
-
-            if ($user->getMoney()<$price){
+            if ($user->getMoney() < $price) {
                 throw new Exception('You don\'t have enough money!');
             }
 
             $product->reduceQuantity($amount);
             $offer->getUser()->increaseMoney($price);
 
-            $purchasedProduct=new Product();
-            $purchasedProduct->setName($product->getName());
-            $purchasedProduct->setUser($user);
-            $purchasedProduct->setQuantity($amount);
-            $purchasedProduct->setImage($product->getImage());
-
-            $user->addProduct($product);
+            $purchasedProduct = $storeManager->cloneProduct($product, $user, $amount);
             $user->reduceMoney($price);
 
-
-            if($product->getQuantity()==0){
-                foreach ($offer->getReviews() as $review){
+            if ($product->getQuantity() == 0) {
+                foreach ($offer->getReviews() as $review) {
                     $em->remove($review);
                 }
                 foreach ($offer->getPromotions() as $promotion) {
@@ -124,7 +116,7 @@ class CartController extends Controller
         }
 
         $em->flush();
-        $this->addFlash('success','Purchases successful!');
+        $this->addFlash('success', 'Purchases successful!');
         return $this->redirectToRoute('products_list');
     }
 

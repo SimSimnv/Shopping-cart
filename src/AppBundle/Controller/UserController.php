@@ -19,6 +19,7 @@ class UserController extends Controller
     public function indexAction($name)
     {
         $user=$this->getDoctrine()->getRepository(User::class)->findOneBy(['username'=>$name]);
+
         return $this->render('main/users/profile.html.twig',['user'=>$user]);
     }
 }

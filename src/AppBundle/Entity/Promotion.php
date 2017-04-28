@@ -27,6 +27,7 @@ class Promotion
      * @var int
      *
      * @ORM\Column(name="percent", type="integer")
+     * @Assert\NotBlank(message="Enter discount percent!")
      * @Assert\Range(min="1",max="99", minMessage="Please enter a positive number!", maxMessage="Promotion can't be larger than 99 percent!")
      */
     private $percent;
@@ -35,6 +36,7 @@ class Promotion
      * @var \DateTime
      *
      * @ORM\Column(name="start_date", type="date")
+     * @Assert\NotBlank(message="Enter start date!")
      * @Assert\Date()
      */
     private $startDate;
@@ -43,6 +45,7 @@ class Promotion
      * @var \DateTime
      *
      * @ORM\Column(name="end_date", type="date")
+     * @Assert\NotBlank(message="Enter end date!")
      * @Assert\Date()
      */
     private $endDate;

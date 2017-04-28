@@ -21,3 +21,5 @@ services:
     price_calculator:
         class: AppBundle\Service\PriceCalculator
         arguments: ['@promotion_manager']
+    store_manager:
+        class: AppBundle\Service\StoreManager

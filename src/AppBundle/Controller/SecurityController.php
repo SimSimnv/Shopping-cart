@@ -16,28 +16,28 @@ class SecurityController extends Controller
      */
     public function registerAction(Request $request)
     {
-        $user=new User();
-        $form=$this->createForm(UserType::class,$user);
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
+        if ($form->isSubmitted() && $form->isValid()) {
 
-            $encoder=$this->get('security.password_encoder');
-            $passwordHash= $encoder->encodePassword($user,$user->getPassword());
+            $encoder = $this->get('security.password_encoder');
+            $passwordHash = $encoder->encodePassword($user, $user->getPassword());
 
             $user->setPassword($passwordHash);
             $user->setMoney(500);
-            $role=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_USER']);
+            $role = $this->getDoctrine()->getRepository(Role::class)->findOneBy(['name' => 'ROLE_USER']);
             $user->addRole($role);
 
-
-            $em=$this->getDoctrine()->getManager();
+            $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
-            $this->addFlash('success','User '.$user->getUsername()." was registered successfully!");
+            $this->addFlash('success', 'User ' . $user->getUsername() . " was registered successfully!");
+
             return $this->redirectToRoute("user_login");
         }
-        return $this->render("main/security/register.html.twig",['register_form'=>$form->createView()]);
+        return $this->render("main/security/register.html.twig", ['register_form' => $form->createView()]);
     }
 
     /**
@@ -45,11 +45,11 @@ class SecurityController extends Controller
      */
     public function loginAction()
     {
-        $auth_utils=$this->get('security.authentication_utils');
+        $auth_utils = $this->get('security.authentication_utils');
 
-        return $this->render("main/security/login.html.twig",[
-            'last_username'=>$auth_utils->getLastUsername(),
-            'error'=>$auth_utils->getLastAuthenticationError()
+        return $this->render("main/security/login.html.twig", [
+            'last_username' => $auth_utils->getLastUsername(),
+            'error' => $auth_utils->getLastAuthenticationError()
         ]);
     }
 

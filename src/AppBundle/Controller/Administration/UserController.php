@@ -3,9 +3,9 @@
 namespace AppBundle\Controller\Administration;
 
 
-
 use AppBundle\Entity\Role;
 use AppBundle\Entity\User;
+use AppBundle\Form\UserEditType;
 use AppBundle\Form\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -23,59 +23,47 @@ class UserController extends Controller
     /**
      * @Route("/", name="admin_users_list")
      */
-    public function usersIndexAction()
+    public function indexAction()
     {
-        $users=$this->getDoctrine()->getRepository(User::class)->findAll();
-        return $this->render('administration/users/list.html.twig', ['users'=>$users]);
+        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
+
+        return $this->render('administration/users/list.html.twig', ['users' => $users]);
     }
 
     /**
      * @Route("/{id}/edit", name="admin_users_edit")
      */
-    public function usersEditAction(Request $request, User $user)
+    public function editAction(Request $request, User $user)
     {
-        $userRole=$user->getHighestRole();
-        $form=$this->createForm(UserType::class,$user);
-        $form->add('money',MoneyType::class);
-        $form->remove('password');
-        $form->remove('email');
-
-        if($userRole!='Administrator'){
-            $form->add('promote',SubmitType::class);
-        }
-        if($userRole!='User'){
-            $form->add('demote',SubmitType::class);
-        }
-        $form->add('edit',SubmitType::class);
+        $form=$this->createForm(UserEditType::class,$user);
 
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
-            $em=$this->getDoctrine()->getManager();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
 
-            if($form->has('promote') && $form->get('promote')->isClicked()){
+            if ($form->has('promote') && $form->get('promote')->isClicked()) {
                 $this->promoteUser($user);
                 $em->flush();
-                $this->addFlash('success','User '.$user->getUsername().' promoted!');
-                return $this->redirectToRoute('admin_users_edit',['id'=>$user->getId()]);
-            }
-            else if($form->has('demote') &&$form->get('demote')->isClicked()){
+                $this->addFlash('success', 'User ' . $user->getUsername() . ' promoted!');
+                return $this->redirectToRoute('admin_users_edit', ['id' => $user->getId()]);
+            } else if ($form->has('demote') && $form->get('demote')->isClicked()) {
                 $this->demoteUser($user);
                 $em->flush();
-                $this->addFlash('success','User '.$user->getUsername().' demoted!');
-                return $this->redirectToRoute('admin_users_edit',['id'=>$user->getId()]);
+                $this->addFlash('success', 'User ' . $user->getUsername() . ' demoted!');
+                return $this->redirectToRoute('admin_users_edit', ['id' => $user->getId()]);
             }
 
             $em->flush();
-            $this->addFlash('success','User edit successful!');
-            return $this->redirectToRoute('admin_users_edit',['id'=>$user->getId()]);
+            $this->addFlash('success', 'User edit successful!');
+            return $this->redirectToRoute('admin_users_edit', ['id' => $user->getId()]);
         }
 
         return $this->render(
             'administration/users/edit.html.twig',
             [
-                'user'=>$user,
-                'edit_form'=>$form->createView()
+                'user' => $user,
+                'edit_form' => $form->createView()
             ]
         );
 
@@ -83,23 +71,22 @@ class UserController extends Controller
 
     private function promoteUser(User $user)
     {
-        if($user->getHighestRole()=='User'){
-            $editorRole=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_EDITOR']);
+        if ($user->getHighestRole() == 'User') {
+            $editorRole = $this->getDoctrine()->getRepository(Role::class)->findOneBy(['name' => 'ROLE_EDITOR']);
             $user->addRole($editorRole);
-        }
-        else if($user->getHighestRole()=='Editor'){
-            $adminRole=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_ADMIN']);
+        } else if ($user->getHighestRole() == 'Editor') {
+            $adminRole = $this->getDoctrine()->getRepository(Role::class)->findOneBy(['name' => 'ROLE_ADMIN']);
             $user->addRole($adminRole);
         }
     }
+
     private function demoteUser(User $user)
     {
-        if($user->getHighestRole()=='Administrator'){
-            $adminRole=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_ADMIN']);
+        if ($user->getHighestRole() == 'Administrator') {
+            $adminRole = $this->getDoctrine()->getRepository(Role::class)->findOneBy(['name' => 'ROLE_ADMIN']);
             $user->removeRole($adminRole);
-        }
-        else if($user->getHighestRole()=='Editor'){
-            $editorRole=$this->getDoctrine()->getRepository(Role::class)->findOneBy(['name'=>'ROLE_EDITOR']);
+        } else if ($user->getHighestRole() == 'Editor') {
+            $editorRole = $this->getDoctrine()->getRepository(Role::class)->findOneBy(['name' => 'ROLE_EDITOR']);
             $user->removeRole($editorRole);
         }
     }
@@ -109,15 +96,15 @@ class UserController extends Controller
      */
     public function banUser(Request $request, User $user)
     {
-        if($user->isBanned()==true){
-            $this->addFlash('error','User is already banned');
+        if ($user->isBanned() == true) {
+            $this->addFlash('error', 'User is already banned');
             return $this->redirectToRoute('admin_users_list');
         }
         $banForm = $this->createFormBuilder([])->getForm();
         $banForm->handleRequest($request);
-        
-        if($banForm->isSubmitted() && $banForm->isValid()){
-            $em=$this->getDoctrine()->getManager();
+
+        if ($banForm->isSubmitted() && $banForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             foreach ($user->getOffers() as $offer) {
                 $offer->setUser($this->getUser());
             }
@@ -126,13 +113,13 @@ class UserController extends Controller
             }
             $user->setBanned(true);
             $em->flush();
-            $this->addFlash('success','User '.$user->getUsername().' banned');
+            $this->addFlash('success', 'User ' . $user->getUsername() . ' banned');
             return $this->redirectToRoute('admin_users_list');
         }
 
-        return $this->render('administration/users/ban.html.twig',[
-            'user'=>$user,
-            'ban_form'=>$banForm->createView()
+        return $this->render('administration/users/ban.html.twig', [
+            'user' => $user,
+            'ban_form' => $banForm->createView()
         ]);
     }
 
@@ -141,24 +128,25 @@ class UserController extends Controller
      */
     public function unBan(Request $request, User $user)
     {
-        if($user->isBanned()==false){
-            $this->addFlash('error','User is not banned');
+        if ($user->isBanned() == false) {
+            $this->addFlash('error', 'User is not banned');
             return $this->redirectToRoute('admin_users_list');
         }
         $unBanForm = $this->createFormBuilder([])->getForm();
         $unBanForm->handleRequest($request);
 
-        if ($unBanForm->isSubmitted() && $unBanForm->isValid()){
-            $em=$this->getDoctrine()->getManager();
+        if ($unBanForm->isSubmitted() && $unBanForm->isValid()) {
+            $em = $this->getDoctrine()->getManager();
             $user->setBanned(false);
             $em->flush();
-            $this->addFlash('success','User '.$user->getUsername().' unbanned');
+            $this->addFlash('success', 'User ' . $user->getUsername() . ' unbanned');
             return $this->redirectToRoute('admin_users_list');
         }
 
-        return $this->render('administration/users/unban.html.twig',[
-            'user'=>$user,
-            'unban_form'=>$unBanForm->createView()
+        return $this->render('administration/users/unban.html.twig', [
+            'user' => $user,
+            'unban_form' => $unBanForm->createView()
         ]);
     }
+
 }

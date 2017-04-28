@@ -26,6 +26,7 @@ class Product
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Assert\NotBlank(message="Enter product name!")
      */
     private $name;
 
@@ -33,6 +34,8 @@ class Product
      * @var int
      *
      * @ORM\Column(name="quantity", type="integer")
+     * @Assert\NotBlank(message="Enter quantity")
+     * @Assert\GreaterThanOrEqual(value="1", message="Enter valid quantity!")
      */
     private $quantity;
 

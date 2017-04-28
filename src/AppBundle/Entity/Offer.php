@@ -65,6 +65,12 @@ class Offer
      */
     private $product;
 
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="created_on", type="datetime")
+     */
+    private $createdOn;
+
     private $quantity=1;
 
     /**
@@ -93,11 +99,20 @@ class Offer
      */
     private $promotions;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_featured", type="boolean")
+     */
+    private $isFeatured;
+
     public function __construct()
     {
         $this->buyers=new ArrayCollection();
         $this->reviews=new ArrayCollection();
         $this->promotions=new ArrayCollection();
+        $this->createdOn=new \DateTime();
+        $this->isFeatured=false;
     }
 
 
@@ -293,6 +308,38 @@ class Offer
     public function setPromotions($promotions)
     {
         $this->promotions = $promotions;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedOn()
+    {
+        return $this->createdOn;
+    }
+
+    /**
+     * @param \DateTime $createdOn
+     */
+    public function setCreatedOn(\DateTime $createdOn)
+    {
+        $this->createdOn = $createdOn;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIsFeatured()
+    {
+        return $this->isFeatured;
+    }
+
+    /**
+     * @param bool $isFeatured
+     */
+    public function setIsFeatured(bool $isFeatured)
+    {
+        $this->isFeatured = $isFeatured;
     }
 
 

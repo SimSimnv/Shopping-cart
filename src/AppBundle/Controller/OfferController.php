@@ -17,38 +17,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class OfferController extends Controller
 {
+    const OFFERS_PER_PAGE = 6;
+
     /**
      * @Route("/offers", name="offers_list")
      *
      */
     public function indexAction(Request $request)
     {
-        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
-        $calc=$this->get('price_calculator');
-        $paginator=$this->get('knp_paginator');
-        $query=$this
-            ->getDoctrine()
-            ->getRepository(Offer::class)
-            ->createQueryBuilder('o')
-            ->select('o');
+        $query = $this->getDoctrine()->getRepository(Offer::class)->getSortedQuery();
+        $page = $request->query->getInt('page', 1);
 
-        $pagination=$paginator->paginate(
-            $query->getQuery(),
-            $request->query->getInt('page', 1),
-            6
-        );
-
-        return $this->render(
-            'main/offers/list.html.twig',
-            [
-                'categories' => $categories,
-                'selected' => 'all',
-                'calc'=>$calc,
-                'pagination'=>$pagination
-            ]);
+        return $this->listOffersResponse($query, $page);
     }
 
     /**
@@ -57,31 +41,15 @@ class OfferController extends Controller
      */
     public function categoriesAction(Request $request, $name)
     {
-        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
         $category = $this->getDoctrine()->getRepository(Category::class)->findBy(['name' => $name]);
-        $calc=$this->get('price_calculator');
-        $paginator=$this->get('knp_paginator');
-        $query=$this
-            ->getDoctrine()
-            ->getRepository(Offer::class)
-            ->createQueryBuilder('o')
-            ->select('o')
+        $query = $this
+            ->getDoctrine()->getRepository(Offer::class)->getSortedQuery()
             ->where('o.category = :category')
-            ->setParameter('category',$category);
+            ->setParameter('category', $category);
+        $page = $request->query->getInt('page', 1);
 
-        $pagination=$paginator->paginate(
-            $query->getQuery(),
-            $request->query->getInt('page', 1),
-            6
-        );
-        return $this->render(
-            'main/offers/list.html.twig',
-            [
-                'categories' => $categories,
-                'selected' => $name,
-                'calc'=>$calc,
-                'pagination'=>$pagination
-            ]);
+        return $this->listOffersResponse($query, $page, $name);
+
     }
 
 
@@ -103,9 +71,8 @@ class OfferController extends Controller
                     $this->addToCart($offer);
                     $this->addFlash('success', 'Added to cart!');
                     return $this->redirectToRoute('offers_list');
-                }
-                catch (\Exception $e){
-                    $this->addFlash('error',$e->getMessage());
+                } catch (\Exception $e) {
+                    $this->addFlash('error', $e->getMessage());
                 }
             }
         }
@@ -123,27 +90,14 @@ class OfferController extends Controller
         }
 
 
-
-        $calc=$this->get('price_calculator');
+        $calc = $this->get('price_calculator');
         return $this->render('main/offers/details.html.twig', [
             'offer' => $offer,
             'product' => $offer->getProduct(),
-            'calc'=>$calc,
+            'calc' => $calc,
             'cart_form' => $cartForm->createView(),
             'review_form' => $reviewForm->createView()
         ]);
-    }
-
-    protected function addToCart(Offer $offer)
-    {
-        /**@var $user User* */
-        $user = $this->getUser();
-        if ($user->getPurchases()->contains($offer)){
-            throw new \Exception('Already in cart');
-        }
-        $user->addPurchase($offer);
-        $em = $this->getDoctrine()->getManager();
-        $em->flush();
     }
 
     /**
@@ -161,14 +115,7 @@ class OfferController extends Controller
         }
 
         $offerProduct = $offer->getProduct();
-
-        $userProduct = new Product();
-        $userProduct->setName($offerProduct->getName());
-        $userProduct->setQuantity($offerProduct->getQuantity());
-        $userProduct->setImage($offerProduct->getImage());
-        $userProduct->setUser($user);
-
-        $user->addProduct($userProduct);
+        $offerProduct->setUser($user);
         $em = $this->getDoctrine()->getManager();
         foreach ($offer->getReviews() as $review) {
             $em->remove($review);
@@ -177,11 +124,43 @@ class OfferController extends Controller
             $em->remove($promotion);
         }
         $em->remove($offer);
-        $em->remove($offerProduct);
-        $em->persist($userProduct);
         $em->flush();
         $this->addFlash('success', 'Offer canceled');
         return $this->redirectToRoute('products_list');
+    }
+
+    protected function addToCart(Offer $offer)
+    {
+        /**@var $user User* */
+        $user = $this->getUser();
+        if ($user->getPurchases()->contains($offer)) {
+            throw new \Exception('Already in cart');
+        }
+        $user->addPurchase($offer);
+        $em = $this->getDoctrine()->getManager();
+        $em->flush();
+    }
+
+    protected function listOffersResponse($query, $page, $selected = 'all'): Response
+    {
+        $categories = $this->getDoctrine()->getRepository(Category::class)->findAll();
+        $calc = $this->get('price_calculator');
+
+        $paginator = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $query,
+            $page,
+            self::OFFERS_PER_PAGE
+        );
+
+        return $this->render(
+            'main/offers/list.html.twig',
+            [
+                'categories' => $categories,
+                'selected' => $selected,
+                'calc' => $calc,
+                'pagination' => $pagination
+            ]);
     }
 
 }
