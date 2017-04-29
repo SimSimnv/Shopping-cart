@@ -22,12 +22,14 @@ class StoreManager
 
     public function areDatesValid(Promotion $promotion)
     {
-        $today=(new \DateTime())->format('d-m-Y');
-        $startDate=$promotion->getStartDate()->format('d-m-Y');
-        $endDate=$promotion->getEndDate()->format('d-m-Y');
+        $today=(new \DateTime('today'));
+        $startDate=$promotion->getStartDate();
+        $endDate=$promotion->getEndDate();
+
         if($startDate<$today || $endDate<$today || $endDate<=$startDate){
             return false;
         }
+
         return true;
     }
 }

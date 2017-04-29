@@ -133,16 +133,6 @@ class Product
         $this->user = $user;
     }
 
-    public function getQuantityArray()
-    {
-        $arr=[];
-        $quantity=$this->getQuantity();
-        for ($i=1; $i<=$quantity; $i++){
-            $arr[$i]=$i;
-        }
-        return $arr;
-    }
-
     /**
      * @return string
      */

@@ -47,7 +47,8 @@ class UserController extends Controller
                 $em->flush();
                 $this->addFlash('success', 'User ' . $user->getUsername() . ' promoted!');
                 return $this->redirectToRoute('admin_users_edit', ['id' => $user->getId()]);
-            } else if ($form->has('demote') && $form->get('demote')->isClicked()) {
+            }
+            else if ($form->has('demote') && $form->get('demote')->isClicked()) {
                 $this->demoteUser($user);
                 $em->flush();
                 $this->addFlash('success', 'User ' . $user->getUsername() . ' demoted!');

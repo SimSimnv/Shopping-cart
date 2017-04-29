@@ -28,7 +28,7 @@ class ProductController extends Controller
 
     /**
      * @Route("/products/create", name="products_create")
-     * @Security("has_role('ROLE_USER')")
+     * @Security("has_role('ROLE_EDITOR')")
      */
     public function createAction(Request $request)
     {
@@ -78,20 +78,8 @@ class ProductController extends Controller
     public function sellAction(Request $request, Product $product)
     {
         $offer = new Offer();
+        $offer->setQuantity($product->getQuantity());
         $form = $this->createForm(OfferType::class, $offer);
-
-        $quantity = [];
-        for ($i = 1; $i <= $product->getQuantity(); $i++) {
-            $quantity[$i] = $i;
-        }
-
-        $form->add(
-            'quantity',
-            ChoiceType::class,
-            [
-                'choices' => $quantity,
-            ]
-        );
 
         $form->handleRequest($request);
 

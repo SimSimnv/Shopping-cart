@@ -49,18 +49,7 @@ class OfferController extends Controller
         $offer->setQuantity($product->getQuantity());
 
         $editorForm=$this->createForm(OfferEditType::class,$offer);
-        $quantity=[];
-        for ($i=1; $i<=$product->getQuantity(); $i++){
-            $quantity[$i]=$i;
-        }
 
-        $editorForm->add(
-            'quantity',
-            ChoiceType::class,
-            [
-                'choices'=>$quantity,
-            ]
-        );
         $editorForm->handleRequest($request);
 
         if($editorForm->isSubmitted() && $editorForm->isValid()){

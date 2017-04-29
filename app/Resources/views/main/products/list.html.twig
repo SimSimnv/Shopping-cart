@@ -12,7 +12,11 @@
                 <hr>
         </div>
         <div class="my-products-btn">
-            <a href="{{ path('products_create') }}" class="btn btn-info">Add a product!</a>
+            {% if is_granted('ROLE_EDITOR') %}
+                <a href="{{ path('products_create') }}" class="btn btn-info">Add a product!</a>
+            {% else %}
+                <a href="{{ path('offers_list') }}" class="btn btn-info">Buy a product!</a>
+            {% endif %}
         </div>
     {% for product in products %}
         <div class="my-product">
