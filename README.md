@@ -35,3 +35,6 @@ Shopping-cart application build with the Symfony framework. Project Assignment f
 *	Users can sell products and put them promotions
 *	Users can make comments on products (review)
 
+### Link to live site: http://shopping-cart.simsim.cloudvps.bg/web/
+* Admin acc: username: admin  password:admin
+* Editor acc: username: editor password:editor
